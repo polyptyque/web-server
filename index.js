@@ -56,12 +56,19 @@ var hbs = exphbs.create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.enable('view cache');
+var scripts = ["main.js"];
 
+// Demo
+function Demo(req, res, next) {
+    console.log('Demo.');
+    res.render('demo', _(config).extend({layout: 'main',title:config.name, scripts:["demo.js"], bodyClasses:['demo']}));
+}
+app.get('/demo', Demo);
 // Home
 function Home(req, res, next) {
     console.log('Home.');
     console.log(req.body);
-    res.render('home', _(config).extend({layout: 'main',title:config.name}));
+    res.render('home', _(config).extend({layout: 'main',title:config.name, scripts:scripts, bodyClasses:['home']}));
 }
 app.get('/', Home);
 app.post('/', Home);
