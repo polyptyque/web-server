@@ -17,6 +17,7 @@ body.demo > div.demo-wrapper{
     height:100%;
     position: absolute;
 }
+/*
 .debug{
     position: absolute;
     color:#0f8;
@@ -31,3 +32,4 @@ body.demo > div.demo-wrapper{
 .debug > div:before{
     content:attr(class) ' :';
 }
+*/

@@ -106,10 +106,10 @@ jQuery(document).ready(function($){
             var alpha = event.alpha || 0,
                 beta = event.beta || 0,
                 gamma = event.gamma || 0;
-            $('.alpha').text(alpha);
-            $('.beta').text(beta);
-            $('.gamma').text(gamma);
-            console.log(event)
+            //$('.alpha').text(alpha);
+            //$('.beta').text(beta);
+            //$('.gamma').text(gamma);
+            //console.log(event)
             if(alpha){
                 var axe = ratio < 1 ? gamma : beta;
                 var n = (Math.min(Math.max(-1,axe/-40),1)+1)/2;
