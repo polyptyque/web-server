@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 //
+var Canvas = require('context-blender');
 
 // config file test
 var configFile = './config.json',
@@ -58,12 +59,27 @@ app.set('view engine', 'handlebars');
 app.enable('view cache');
 var scripts = ["main.js"];
 
+// Mix
+function MixImages(req, res, next){
+    var A = req.params.A,
+        B = req.params.B,
+        n = req.params.n,
+        canvasA = new Canvas(),
+        canvasB = new Canvas();
+    console.log(A,B,n);
+    res.status(500).end('In progress');
+}
+app.get('/mix-:A-:B-:n.jpg',MixImages);
+
 // Demo
 function Demo(req, res, next) {
-    console.log('Demo.');
-    res.render('demo', _(config).extend({layout: 'main',title:config.name, scripts:["demo.js"], bodyClasses:['demo']}));
+    console.log('Demo. '+req.originalUrl);
+    var imgBaseUrl = req.originalUrl == '/demo' ? 'img/demo/':'mix-A-B-';
+    res.render('demo', _(config).extend({imgBaseUrl:imgBaseUrl, layout: 'main',title:config.name, scripts:["demo.js"], bodyClasses:['demo']}));
 }
 app.get('/demo', Demo);
+app.get('/demo-mix', Demo);
+
 // Home
 function Home(req, res, next) {
     console.log('Home.');

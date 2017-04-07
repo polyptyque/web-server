@@ -7,6 +7,7 @@ jQuery(document).ready(function($){
         side = max-center,
         width, height, ratio,
         wrapper = $('.demo-wrapper'),
+        imgBaseUrl = wrapper.data('imgbaseurl'),
         $canvas = $('canvas'),
         canvas = $canvas.get(0),
         ctx = canvas.getContext('2d'),
@@ -80,16 +81,22 @@ jQuery(document).ready(function($){
     }
 
     function LoadImage(i,callback){
-        var imgUrl = 'img/demo/'+i+'.jpg',
+        var n = i == center ? '0':
+                i < center ? 'r' + (center-i) :
+                             'l' + (i-center),
+            imgUrl = imgBaseUrl+n+'.jpg',
             img = new Image();
-        img.addEventListener('load',function(){
+        function onLoad(e){
+            if(e.type == "error") return;
             images[i] = img;
             if(i<max){
                 LoadImage(i+1,callback);
             }else{
                 callback();
             }
-        });
+        }
+        img.addEventListener('load',onLoad);
+        img.addEventListener('error',onLoad);
         img.src = imgUrl;
     }
     // $(window).on('mousemove',function(e){
