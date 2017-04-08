@@ -5,6 +5,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 VOLUME /usr/src/app/uploads
+VOLUME /usr/src/app/mixes
 
 # Install app dependencies
 COPY package.json /usr/src/app/
