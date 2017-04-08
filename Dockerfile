@@ -4,11 +4,11 @@ FROM node:alpine
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
+VOLUME /usr/src/app/uploads
+
 # Install app dependencies
 COPY package.json /usr/src/app/
 RUN npm install
-
-VOLUME /usr/src/app/uploads
 
 # Bundle app source
 COPY . /usr/src/app

@@ -18,6 +18,6 @@ docker rm -f polyptyque.photo
 
 echo -e "$Green> Run the container... $Color_Off"
 
-docker run -d -e VIRTUAL_HOST=polyptyque.photo --name polyptyque.photo --restart=always polyptyque:latest
+docker run -d -e VIRTUAL_HOST=polyptyque.photo --name polyptyque.photo --restart=always -v $(pwd)/uploads:/usr/src/app/uploads polyptyque:latest
 
 echo -e "$Green> Done.$Color_Off"
