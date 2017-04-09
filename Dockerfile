@@ -1,19 +1,27 @@
-FROM node:alpine
+FROM node:latest
 
-# Create app directory
+# Installe les packages requis (pour node-canvas)
+RUN apt-get update \
+    && apt-get install -qq libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev build-essential g++
+
+
+# Créé les dossiers de l'app
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
+# Marque les volumes
 VOLUME /usr/src/app/uploads
 VOLUME /usr/src/app/mixes
 
-# Install app dependencies
+# Installe les packages npm
 COPY package.json /usr/src/app/
 RUN npm install
 
-# Bundle app source
+# Copie les sources
 COPY . /usr/src/app
 
+# Expose des ports réseaux
 EXPOSE 80
 EXPOSE 7777
+# Démarre l'application
 CMD [ "npm", "start" ]
