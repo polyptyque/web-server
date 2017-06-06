@@ -5936,6 +5936,9 @@ footer {
     .polypoto-title img.logo {
       width: 100%;
       margin: 20px 0 0 20px; }
+  .polypoto-title span {
+    position: absolute;
+    visibility: hidden; }
 
 .polypoto, .polypoto h2, .polypoto p {
   font-size: 16px; }
