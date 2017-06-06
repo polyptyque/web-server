@@ -14,9 +14,12 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
 }));
 //
-var Canvas = require('canvas'),
-    Image = Canvas.Image;
-
+try {
+    var Canvas = require('canvas'),
+        Image = Canvas.Image;
+}catch(err){
+    console.log('ATTENTION : Canvas indisponible');
+}
 // config file test
 var configFile = './config.json',
     configFileDefault = './config-default.json';

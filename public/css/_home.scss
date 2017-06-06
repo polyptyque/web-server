@@ -1,0 +1,18 @@
+.home{
+  > *{
+    margin:auto;
+    left:0;
+    right:0;
+    position:relative;
+  }
+  text-align: center;
+}
+.home-intro{
+  width:600px;
+  padding-bottom: 50px;
+  margin-top: 50px;
+  strong{
+    color:$red;
+    text-transform:uppercase;
+  }
+}

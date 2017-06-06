@@ -1,0 +1,71 @@
+.polypoto-title{
+  position: relative;
+  padding: 20px;
+  width:440px;
+  max-width: 100%;
+  margin: auto;
+  img{
+    display: block;
+    position: relative;
+    margin: 20px auto 0;
+    height: auto;
+    max-width: 100%;
+    &.portrait{
+      width:338px;
+    }
+    &.logo{
+      width:100%;
+      margin: 20px 0 0 20px;
+    }
+  }
+
+}
+.polypoto{
+  &,h2,p{
+    font-size:16px;
+  }
+  h2{
+    font-weight: 400;
+    margin: 2em 0 0;
+  }
+  p{
+    font-weight: 400;
+    max-width: 100%;
+  }
+  strong{
+    color:$red;
+    font-weight: 500;
+  }
+  em{
+    font-weight: 400;
+  }
+  .p-1{
+
+  }
+  .p-2{
+    color:$red;
+    font-size:24px;
+    font-weight: 500;
+    width:15em;
+    margin: 1.5em auto 0;
+    + .p-2{
+      margin: .5em auto 2em;
+    }
+  }
+  .p-3{
+
+  }
+  .details{
+    margin-top: 4em;
+    margin-bottom: 4em;
+    p{
+      font-size:12px;
+      text-align: left;
+    }
+  }
+  @media (max-width:#{$screen-sm}) {
+    .p-2{
+      font-size: 18px;
+    }
+  }
+}

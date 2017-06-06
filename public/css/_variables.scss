@@ -1,0 +1,19 @@
+$beige: #fff0c3;
+$red: #e53428;
+$grey: #646464;
+$white: #FFFFFF;
+
+$brand-primary:         $red;
+$brand-success:         mix($red,$beige);
+$brand-info:            $grey;
+$brand-warning:         lighten($red,.5);
+$brand-danger:          $red;
+
+$ipad-width:768px;
+$ipad-height:1024px;
+
+
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,100i,500,500i,700');
+$montserrat: 'Montserrat', sans-serif;
+
+//$montserrat: 'Montserrat', src: url('https://fonts.googleapis.com/css?family=Montserrat');
