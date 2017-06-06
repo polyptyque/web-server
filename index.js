@@ -167,7 +167,7 @@ app.use(express.static('public'));
 
 // 404
 app.use(function(req, res, next) {
-    res.status(404).end('404 not found \n'+req.url);
+    res.status(404).render('not-found',_(config).extend({layout:'main',title:'404 non trouvé',scripts:[],bodyClasses:['404']}));
 });
 
 // Server
