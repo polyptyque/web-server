@@ -9,7 +9,7 @@ var app = express();
 var bodyParser = require('body-parser');
 var multiparty = require('multiparty');
 var sha1 = require('sha1');
-var targz = require('targz');
+var targz = require('tar.gz');
 //
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
