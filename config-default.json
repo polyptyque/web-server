@@ -1,5 +1,6 @@
 {
   "PORT":"80",
+  "private_key":"********",
   "name":"Polyptyque - POLYPOTO",
   "description":"Venez découvrir et participer à l’expérience POLYPOTO"
 }

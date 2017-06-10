@@ -63,6 +63,23 @@ app.set('view engine', 'handlebars');
 app.enable('view cache');
 var scripts = ["main.js"];
 
+function postImage(req, res) {
+
+    // form;
+    var form = new multiparty.Form();
+
+    form.parse(req, function (err, fields, files) {
+
+        if(err) return res.status(500).send(err.toString());
+        if(!files) return res.status(500).send("fichiers absents");
+
+        res.json({fields:fields,files:files});
+
+    });
+}
+
+app.post('/upload',postImage);
+
 // Mix
 function MixImages(req, res, next){
     var A = req.params.A,
