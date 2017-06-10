@@ -8,6 +8,8 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var multiparty = require('multiparty');
+var sha1 = require('sha1');
+var targz = require('targz');
 //
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -65,17 +67,48 @@ var scripts = ["main.js"];
 
 function postImage(req, res) {
 
-    // form;
-    var form = new multiparty.Form();
+    try {
+        // form;
+        var form = new multiparty.Form();
 
-    form.parse(req, function (err, fields, files) {
+        form.parse(req, function (err, fields, files) {
 
-        if(err) return res.status(500).send(err.toString());
-        if(!files) return res.status(500).send("fichiers absents");
+            if (err) return res.status(500).send(err.toString());
+            if (!files) return res.status(500).send("fichiers absents");
+            //
+            // uid
+            // form
+            // signature sha1(private_key+uid)
+            // archive file tar gz
+            try {
+                var uid = fields.uid[0],
+                    signature = fields.signature[0],
+                    form_responses = fields.form_responses[0],
+                    archive = files.archive[0],
+                    dirPath = uploadDir+uid,
+                    archivePath = archive.path;
+            }catch(err){
+                return res.status(500).send("erreur dans les champs du formulaire. \n"+err.toString());
+            }
 
-        res.json({fields:fields,files:files});
+            if (signature != sha1(config.private_key+uid)) return res.status(500).send("signature invalide");
 
-    });
+            if (!fs.existsSync(dirPath)){
+                fs.mkdirSync(dirPath);
+            }
+
+            targz().extract(archivePath,dirPath).then(function(){
+                res.send('archive extract success')
+            }).catch(function(){
+                res.status(500).send('archive extract fail')
+            });
+
+            //res.json({fields: fields, files: files});
+
+        });
+    }catch(err){
+        res.status(500).send('server error');
+    }
 }
 
 app.post('/upload',postImage);
