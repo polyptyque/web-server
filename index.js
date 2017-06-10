@@ -10,6 +10,7 @@ var bodyParser = require('body-parser');
 var multiparty = require('multiparty');
 var sha1 = require('sha1');
 var targz = require('tar.gz');
+var mysql = require('mysql');
 //
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -97,7 +98,7 @@ function postImage(req, res) {
                 fs.mkdirSync(dirPath);
             }
 
-            targz().extract(archivePath,dirPath).then(function(){
+            targz().extract(archivePath,uploadDir).then(function(){
                 res.send('archive extract success')
             }).catch(function(){
                 res.status(500).send('archive extract fail')
