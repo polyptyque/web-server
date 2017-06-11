@@ -109,7 +109,7 @@ function postImage(req, res) {
                     firstname = form_responses.firstname,
                     lastname = form_responses.lastname,
                     email = form_responses.email,
-                    responses = _(response_fields_mapping).map(function(val,key){
+                    responses = _(response_fields_mapping).mapObject(function(val,key){
                         return form_responses[val];
                     });
             }catch(err){
