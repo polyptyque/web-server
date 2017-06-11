@@ -144,15 +144,23 @@ function postImage(req, res) {
                     "'"+responses.res7+"', " +
                     "'"+responses.res8+"')";
 
-
+                function MysqlError(err){
+                    connection.end();
+                    res.status(500).send(err.toString());
+                }
 
                 connection.query(query, function (err, results, fields) {
-                    if (err) throw res.status(500).send(err.toString());
-                    res.json(results);
+                    if (err) return MysqlError(err);
+
+                    query = "SELECT * FROM `shot` WHERE `shot_id` != "+results.insertId;
+                    connection.query(query, function(err, results, fields) {
+                        if (err) return MysqlError(err);
+                        res.json({results:results,fields:fields});
+                        connection.end();
+                    });
                     //console.log('The solution is: ', results[0].solution);
                 });
 
-                connection.end();
             }).catch(function(){
                 res.status(500).send('archive extract fail')
             });
