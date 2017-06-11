@@ -73,6 +73,17 @@ app.set('view engine', 'handlebars');
 app.enable('view cache');
 var scripts = ["main.js"];
 
+var response_fields_mapping = {
+    res1:'temper',
+    res2:'quality',
+    res3:'hobby',
+    res4:'prefer',
+    res5:'job',
+    res6:'money',
+    res7:'lenaintillemon',
+    res8:'narvalo'
+};
+
 function postImage(req, res) {
 
     try {
@@ -91,10 +102,16 @@ function postImage(req, res) {
             try {
                 var uid = fields.uid[0],
                     signature = fields.signature[0],
-                    form_responses = fields.form_responses[0],
+                    form_responses = JSON.parse(fields.form_responses[0]),
                     archive = files.archive[0],
                     dirPath = uploadDir+uid,
-                    archivePath = archive.path;
+                    archivePath = archive.path,
+                    firstname = form_responses.firstname,
+                    lastname = form_responses.lastname,
+                    email = form_responses.email,
+                    responses = _(response_fields_mapping).map(function(val,key){
+                        return form_responses[val];
+                    });
             }catch(err){
                 return res.status(500).send("erreur dans les champs du formulaire. \n"+err.toString());
             }
@@ -121,7 +138,7 @@ function postImage(req, res) {
                 res.json({
                     status:'ok',
                     uid:uid,
-                    form_responses:form_responses
+                    responses:responses,
                 });
 
                 // connection.query(query, function (err, results, fields) {
