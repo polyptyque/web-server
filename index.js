@@ -166,9 +166,9 @@ function postImage(req, res) {
                         _(results).each(function(shot){
                             var score = 0;
                             for(var r=1; r<=8; r++){
-                                score += line['res'+r] == responses['res'+r] ? 1 : 0;
+                                score += shot['res'+r] == responses['res'+r] ? 1 : 0;
                             }
-                            values.push(" (NULL, '"+insertId+"', '"+shot_id+"', '"+score+"')")
+                            values.push(" (NULL, '"+insertId+"', '"+shot.shot_id+"', '"+score+"')")
                         });
                         query += values.join(',')+';';
                         connection.query(query, function(err, results, fields) {
