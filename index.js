@@ -148,15 +148,35 @@ function postImage(req, res) {
                     connection.end();
                     res.status(500).send(err.toString());
                 }
-
+                //
+                // ajout de la prise de vues
+                //
                 connection.query(query, function (err, results, fields) {
                     if (err) return MysqlError(err);
-
-                    query = "SELECT * FROM `shot` WHERE `shot_id` != "+results.insertId;
+                    // selection des prises de vues existantes (non nouvelle)
+                    var insertId = results.insertId;
+                    query = "SELECT * FROM `shot` WHERE `shot_id` != "+insertId;
                     connection.query(query, function(err, results, fields) {
                         if (err) return MysqlError(err);
-                        res.json({results:results,fields:fields});
-                        connection.end();
+                        //
+                        // ajout des relations
+                        //
+                        var query = "INSERT INTO `relation` (`id`, `shot0`, `shot1`, `value`) VALUES ";
+                        var values = [];
+                        _(results).each(function(shot){
+                            var score = 0;
+                            for(var r=1; r<=8; r++){
+                                score += line['res'+r] == responses['res'+r] ? 1 : 0;
+                            }
+                            values.push(" (NULL, '"+insertId+"', '"+shot_id+"', '"+score+"')")
+                        });
+                        query += values.join(',')+';';
+                        connection.query(query, function(err, results, fields) {
+                            if (err) return MysqlError(err);
+                            res.json(results);
+                            connection.end();
+                        });
+
                     });
                     //console.log('The solution is: ', results[0].solution);
                 });
