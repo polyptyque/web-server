@@ -2,5 +2,11 @@
   "PORT":"80",
   "private_key":"********",
   "name":"Polyptyque - POLYPOTO",
-  "description":"Venez découvrir et participer à l’expérience POLYPOTO"
+  "description":"Venez découvrir et participer à l’expérience POLYPOTO",
+  "mysql":{
+    "host":"mysql",
+    "user":"polypoto",
+    "password":"secret",
+    "database":"polypoto"
+  }
 }

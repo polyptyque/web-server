@@ -45,6 +45,13 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 //
+var connection = mysql.createConnection({
+    host     : config.mysql.host,
+    user     : config.mysql.user,
+    password : config.mysql.password,
+    database : config.mysql.database
+});
+//
 
 // express handlerbars template
 var exphbs  = require('express-handlebars');
@@ -99,7 +106,31 @@ function postImage(req, res) {
             }
 
             targz().extract(archivePath,uploadDir).then(function(){
-                res.send('archive extract success')
+                //res.send('archive extract success');
+                //
+                // INSERT INTO `shot` (`shot_id`, `uid`, `date`, `user_firstname`, `user_lastname`, `user_email`, `res1`, `res2`, `res3`, `res4`, `res5`, `res6`, `res7`, `res8`) VALUES (NULL, 'test_uid', CURRENT_TIMESTAMP, 'arthur', 'violy', 'arthur@violy.net', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
+                //
+                connection.connect();
+
+                var query = "INSERT INTO `shot` " +
+                    "(`shot_id`, `uid`, `date`, `user_firstname`, `user_lastname`, `user_email`, " +
+                    "`res1`, `res2`, `res3`, `res4`, `res5`, `res6`, `res7`, `res8`) " +
+                    "VALUES (NULL, 'test_uid', CURRENT_TIMESTAMP, 'arthur', 'violy', 'arthur@violy.net', " +
+                    "'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')";
+
+                res.json({
+                    status:'ok',
+                    uid:uid,
+                    form_responses:form_responses
+                });
+
+                // connection.query(query, function (err, results, fields) {
+                //     if (err) throw res.status(500).send(err.toString());
+                //     res.json(results);
+                //     //console.log('The solution is: ', results[0].solution);
+                // });
+                //
+                // connection.end();
             }).catch(function(){
                 res.status(500).send('archive extract fail')
             });
