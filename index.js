@@ -130,24 +130,29 @@ function postImage(req, res) {
                 connection.connect();
 
                 var query = "INSERT INTO `shot` " +
-                    "(`shot_id`, `uid`, `date`, `user_firstname`, `user_lastname`, `user_email`, " +
+                    "(`shot_id`, `uid`, `date`, " +
+                    "`user_firstname`, `user_lastname`, `user_email`, " +
                     "`res1`, `res2`, `res3`, `res4`, `res5`, `res6`, `res7`, `res8`) " +
-                    "VALUES (NULL, 'test_uid', CURRENT_TIMESTAMP, 'arthur', 'violy', 'arthur@violy.net', " +
-                    "'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')";
+                    "VALUES (NULL, '"+uid+"', CURRENT_TIMESTAMP, " +
+                    "'"+firstname+"', '"+lastname+"', '"+email+"', " +
+                    "'"+responses.res1+"', " +
+                    "'"+responses.res2+"', " +
+                    "'"+responses.res3+"', " +
+                    "'"+responses.res4+"', " +
+                    "'"+responses.res5+"', " +
+                    "'"+responses.res6+"', " +
+                    "'"+responses.res7+"', " +
+                    "'"+responses.res8+"')";
 
-                res.json({
-                    status:'ok',
-                    uid:uid,
-                    responses:responses,
+
+
+                connection.query(query, function (err, results, fields) {
+                    if (err) throw res.status(500).send(err.toString());
+                    res.json(results);
+                    //console.log('The solution is: ', results[0].solution);
                 });
 
-                // connection.query(query, function (err, results, fields) {
-                //     if (err) throw res.status(500).send(err.toString());
-                //     res.json(results);
-                //     //console.log('The solution is: ', results[0].solution);
-                // });
-                //
-                // connection.end();
+                connection.end();
             }).catch(function(){
                 res.status(500).send('archive extract fail')
             });
