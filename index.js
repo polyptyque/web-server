@@ -103,14 +103,15 @@ function postImage(req, res) {
                 var uid = fields.uid[0],
                     signature = fields.signature[0],
                     form_responses = JSON.parse(fields.form_responses[0]),
-                    archive = files.archive[0],
                     dirPath = uploadDir+uid,
-                    archivePath = archive.path,
+                    archivePath = dirPath+'.tar.gz',
                     firstname = form_responses.firstname,
                     lastname = form_responses.lastname,
                     email = form_responses.email,
                     responses = _(response_fields_mapping).mapObject(function(val,key){
-                        return form_responses[val];
+                        var response = form_responses[val];
+                        if(response) return response;
+                        return "none";
                     });
             }catch(err){
                 return res.status(500).send("erreur dans les champs du formulaire. \n"+err.toString());
