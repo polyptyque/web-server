@@ -48,6 +48,10 @@ var uploadDir = './uploads/';
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
 }
+var thumbsDir = './mixes/thumbs/';
+if (!fs.existsSync(thumbsDir)) {
+    fs.mkdirSync(thumbsDir);
+}
 
 //
 var connection = mysql.createConnection({
@@ -171,7 +175,7 @@ function postImage(req, res) {
                     if (err) return MysqlError(err);
                     // selection des prises de vues existantes (non nouvelle)
                     var insertId = results.insertId;
-                    query = "SELECT * FROM `shot` WHERE `shot_id` != "+insertId;
+                    query = "SELECT * FROM `shot` WHERE `shot_id` != "+insertId+" AND `enabled` = 1";
                     connection.query(query, function(err, results, fields) {
                         if (err) return MysqlError(err);
                         //
@@ -205,6 +209,61 @@ function postImage(req, res) {
 }
 
 app.post('/upload',postImage);
+
+// ThumbsPreview
+function ThumbsPreview(req,res,next){
+    var uid = req.params.uid,
+        canvas = new Canvas(),
+        imgReady = 0,
+        thumbsScale = 0.1,
+        thumbsTotal = 19,
+        thumbWidth, thumbHeight,
+        canvasWidth, canvasHeight,
+        ctx = canvas.getContext('2d');
+
+    function AddImage(){
+        var imgSrc = uploadDir+uid+'/'+imgReady+'.jpg';
+        fs.readFile(imgSrc, function(err, squid){
+            if (err) throw err;
+            if(imgReady == 0){
+                thumbWidth = Math.round(img.width*thumbsScale),
+                thumbHeight = Math.round(img.height*thumbsScale),
+                canvasWidth = thumbWidth*thumbsTotal,
+                canvasHeight = thumbHeight*thumbsTotal
+            }
+            var img = new Image;
+            img.src = squid;
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            ctx.drawImage(img, imgReady*thumbWidth, 0, thumbWidth, thumbHeight);
+            imgReady ++;
+            if(imgReady == 19){
+                Finish();
+            }else{
+                AddImage();
+            }
+        });
+    }
+
+    function Finish(){
+        res.type("jpg");
+        var stream = canvas.jpegStream({bufsize: 4096, quality: 75, progressive:false});
+        stream.pipe(res);
+
+        var fileCachePath = '/mixes/thumbs/preview-'+uid+'.jpg',
+            streamFile = canvas.jpegStream({bufsize: 4096, quality: 75, progressive:false}),
+            cache = fs.createWriteStream(fileCachePath);
+
+        streamFile.on('data', function(chunk){
+            cache.write(chunk);
+        });
+
+        streamFile.on('end', function(){
+            console.log('saved '+fileCachePath);
+        });
+    }
+
+}
 
 // Mix
 function MixImages(req, res, next){
@@ -281,6 +340,7 @@ function MixImages(req, res, next){
 }
 app.use('/mixes',express.static('mixes'));
 app.use('/mixes/:A-:B-:n.jpg',MixImages);
+app.use('/mixes/thumbs/preview-:uid.jpg',ThumbsPreview);
 
 // List all shots
 function ListAllShots(req,res,next){
