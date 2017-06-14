@@ -292,6 +292,17 @@ function Demo(req, res, next) {
 app.get('/demo', Demo);
 app.get('/demo-mix-:a-:b', Demo);
 
+// Demo
+function Preview(req, res, next) {
+    console.log('Demo. '+req.originalUrl);
+    var imgBaseUrl = 'img/demo/',
+        uid = req.params.uid;
+    res.render('preview', _(config).extend({uid:uid, layout: 'main',title:config.name, scripts:["preview.js"], bodyClasses:['demo']}));
+}
+app.get('/preview', Preview);
+app.get('/preview-:uid', Preview);
+
+
 // Home
 function Home(req, res, next) {
     console.log('Home.');
@@ -301,6 +312,8 @@ function Home(req, res, next) {
 app.get('/', Home);
 app.post('/', Home);
 
+// static public
+app.use('/uploads',express.static('uploads'));
 // static public
 app.use(express.static('public'));
 
