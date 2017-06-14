@@ -123,7 +123,7 @@ function postImage(req, res) {
             }
 
             console.log("start extract",archivePath,uploadDir);
-            var extractTarGz = spawn( 'tar', [ '-xzvf', archivePath ])
+            var extractTarGz = spawn( 'tar', [ '-xzvf', archivePath, '-C', uploadDir ])
 
             extractTarGz.stdout.on( 'data', function(data) {
                  console.log( 'stdout: ',data.toString());
