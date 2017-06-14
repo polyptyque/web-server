@@ -13,7 +13,12 @@ $x : 100% / $n;
     picture{
       position: relative;
       width:100%;
-      @include animation(preview 2s);
+      @include animation-name(preview);
+      @include animation-duration(2s);
+      @include animation-fill-mode(both);
+      @include animation-timing-function(step-start);
+      @include animation-direction(reverse);
+
       &:after{
         position: relative;
         content:' ';
