@@ -158,7 +158,6 @@ function postImage(req, res) {
                     "'"+responses.res8+"')";
 
                 function MysqlError(err){
-                    connection.end();
                     res.status(500).send("Mysql error: "+err.toString());
                 }
                 //
