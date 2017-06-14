@@ -88,12 +88,11 @@ function postImage(req, res) {
 
     try {
         // form;
-        var form = new multiparty.Form();
+        /*var form = new multiparty.Form();
 
         form.parse(req, function (err, fields, files) {
 
-            if (err) return res.status(500).send(err.toString());
-            if (!files) return res.status(500).send("fichiers absents");
+            if (err) return res.status(500).send('form parse error: '+err.toString());
             //
             // uid
             // form
@@ -188,7 +187,10 @@ function postImage(req, res) {
 
             //res.json({fields: fields, files: files});
 
+
         });
+        */
+        res.json(req.body);
     }catch(err){
         res.status(500).send('server error');
     }
