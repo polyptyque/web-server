@@ -226,14 +226,16 @@ function ThumbsPreview(req,res,next){
         console.log('AddImage',imgSrc)
         fs.readFile(imgSrc, function(err, squid){
             if (err) throw err;
-            if(imgReady == 0){
-                thumbWidth = Math.round(img.width*thumbsScale),
-                thumbHeight = Math.round(img.height*thumbsScale),
-                canvasWidth = thumbWidth*thumbsTotal,
-                canvasHeight = thumbHeight*thumbsTotal
-            }
             var img = new Image;
             img.src = squid;
+
+            if(imgReady == 0){
+                thumbWidth = Math.round(img.width*thumbsScale),
+                    thumbHeight = Math.round(img.height*thumbsScale),
+                    canvasWidth = thumbWidth*thumbsTotal,
+                    canvasHeight = thumbHeight*thumbsTotal
+            }
+
             canvas.width = canvasWidth;
             canvas.height = canvasHeight;
             ctx.drawImage(img, imgReady*thumbWidth, 0, thumbWidth, thumbHeight);
