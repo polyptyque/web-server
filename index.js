@@ -88,20 +88,17 @@ function postImage(req, res) {
 
     try {
         // form;
-        /*var form = new multiparty.Form();
 
-        form.parse(req, function (err, fields, files) {
 
-            if (err) return res.status(500).send('form parse error: '+err.toString());
             //
             // uid
             // form
             // signature sha1(private_key+uid)
             // archive file tar gz
             try {
-                var uid = fields.uid[0],
-                    signature = fields.signature[0],
-                    form_responses = JSON.parse(fields.form_responses[0]),
+                var uid = req.body.uid,
+                    signature = req.body.signature,
+                    form_responses = req.body.form_responses,
                     dirPath = uploadDir+uid,
                     archivePath = dirPath+'.tar.gz',
                     firstname = form_responses.firstname,
@@ -116,7 +113,8 @@ function postImage(req, res) {
                 return res.status(500).send("erreur dans les champs du formulaire. \n"+err.toString());
             }
 
-            if (signature != sha1(config.private_key+uid)) return res.status(500).send("signature invalide");
+            if (signature != sha1(config.private_key+uid))
+                return res.status(500).send("signature invalide");
 
             if (!fs.existsSync(dirPath)){
                 fs.mkdirSync(dirPath);
@@ -185,12 +183,6 @@ function postImage(req, res) {
                 res.status(500).send('archive extract fail')
             });
 
-            //res.json({fields: fields, files: files});
-
-
-        });
-        */
-        res.json(req.body);
     }catch(err){
         res.status(500).send('server error');
     }
