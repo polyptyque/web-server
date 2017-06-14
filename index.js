@@ -112,7 +112,7 @@ function postImage(req, res) {
                         return "none";
                     });
             }catch(err){
-                return res.status(500).send("erreur dans les champs du formulaire: \n"+err.toString());
+                return res.status(500).send("erreur dans les champs du formulaire: \n"+err.toString()+"\n\n"+JSON.stringify(req.body));
             }
 
             if (signature != sha1(config.private_key+uid))
