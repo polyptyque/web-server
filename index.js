@@ -316,7 +316,7 @@ function MixImages(req, res, next){
 
     function LoadImage(img,imgSrc,canvas,ctx){
         fs.readFile(imgSrc, function(err, squid){
-            if (err) throw err;
+            if (err) {return next();}
             img = new Image;
             img.src = squid;
             canvas.width = img.width;
@@ -350,7 +350,17 @@ function MixImages(req, res, next){
         var stream = toCanvas.jpegStream({bufsize: 4096, quality: 75, progressive:false});
         stream.pipe(res);
 
-        var fileCachePath = 'mixes/'+A+'-'+B+'-'+n+'.jpg',
+        var fileCachePathA = 'mixes/'+A,
+            fileCachePathB = fileCachePathA+'/'+B;
+
+        if (!fs.existsSync(fileCachePathA)) {
+            fs.mkdirSync(fileCachePathA);
+        }
+        if (!fs.existsSync(fileCachePathB)) {
+            fs.mkdirSync(fileCachePathB);
+        }
+
+        var fileCachePath = fileCachePathB+'/'+n+'.jpg',
             streamFile = toCanvas.jpegStream({bufsize: 4096, quality: 75, progressive:false}),
             cache = fs.createWriteStream(fileCachePath);
 
@@ -369,7 +379,7 @@ function MixImages(req, res, next){
     //res.status(500).end('In progress');
 }
 app.use('/mixes',express.static('mixes'));
-app.use('/mixes/:A-:B-:n.jpg',MixImages);
+app.use('/mixes/:A/:B/:n.jpg',MixImages);
 app.use('/mixes/thumbs/preview-:uid.jpg',ThumbsPreview);
 
 // List all shots
