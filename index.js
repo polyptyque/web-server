@@ -144,7 +144,7 @@ function postImage(req, res) {
 
                 function MysqlError(err){
                     connection.end();
-                    res.status(500).send(err.toString());
+                    res.status(500).send("Mysql error: "+err.toString());
                 }
                 //
                 // ajout de la prise de vues
@@ -184,7 +184,7 @@ function postImage(req, res) {
             });
 
     }catch(err){
-        res.status(500).send('server error');
+        res.status(500).send('server error: '+err.toString());
     }
 }
 
