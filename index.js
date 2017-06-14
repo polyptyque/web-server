@@ -223,6 +223,7 @@ function ThumbsPreview(req,res,next){
 
     function AddImage(){
         var imgSrc = uploadDir+uid+'/'+imgReady+'.jpg';
+        console.log('AddImage',imgSrc)
         fs.readFile(imgSrc, function(err, squid){
             if (err) throw err;
             if(imgReady == 0){
@@ -262,6 +263,8 @@ function ThumbsPreview(req,res,next){
             console.log('saved '+fileCachePath);
         });
     }
+
+    AddImage();
 
 }
 
