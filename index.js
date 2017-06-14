@@ -225,7 +225,7 @@ function ThumbsPreview(req,res,next){
         var imgSrc = uploadDir+uid+'/'+imgReady+'.jpg';
         console.log('AddImage',imgSrc)
         fs.readFile(imgSrc, function(err, squid){
-            if (err) throw err;
+            if (err) return next();
             var img = new Image;
             img.src = squid;
 
