@@ -285,7 +285,7 @@ app.use('/mixes/:A-:B-:n.jpg',MixImages);
 // List all shots
 function ListAllShots(req,res,next){
     connection.connect();
-    connection.query("SELECT * FROM `relation` WHERE `enabled` = 1", function(err, results){
+    connection.query("SELECT * FROM `shot` WHERE `enabled` = 1", function(err, results){
         if(err) return req.status(500).send("MySQLError:",err.toString());
         res.render('list-all', _(config).extend({results:results, scripts:["list-all.js"], bodyClasses:['list-all']}))
     });
