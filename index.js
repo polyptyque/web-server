@@ -387,7 +387,7 @@ function ListAllShots(req,res,next){
     var connection = initializeConnection();
     connection.query("SELECT * FROM `shot` WHERE `enabled` = 1", function(err, results){
         if(err) return res.status(500).send("MySQLError:",err.toString());
-        res.render('list-all', _.extend({results:results, scripts:["list-all.js"], bodyClasses:['list-all']},config))
+        res.render('list-all', _.defaults({results:results, scripts:["list-all.js"], bodyClasses:['list-all']},config))
         connection.end();
     });
 }
@@ -402,7 +402,7 @@ function Demo(req, res, next) {
     if(A && B){
         imgBaseUrl = 'mixes/'+A+'/'+B+'/';
     }
-    res.render('demo', _.extend({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo']},config));
+    res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo']},config));
 }
 app.get('/demo', Demo);
 app.get('/demo-mix/:a/:b', Demo);
@@ -412,7 +412,7 @@ function Preview(req, res, next) {
     console.log('Demo. '+req.originalUrl);
     var imgBaseUrl = 'img/demo/',
         uid = req.params.uid;
-    res.render('preview', _.extend({uid:uid,scripts:["preview.js"], bodyClasses:['demo']},config));
+    res.render('preview', _.defaults({uid:uid,scripts:["preview.js"], bodyClasses:['demo']},config));
 }
 app.get('/preview', Preview);
 app.get('/preview-:uid', Preview);
@@ -422,7 +422,7 @@ app.get('/preview-:uid', Preview);
 function Home(req, res, next) {
     console.log('Home.');
     console.log(req.body);
-    res.render('home', _.extend({scripts:scripts, bodyClasses:['home']},config));
+    res.render('home', _.defaults({scripts:scripts, bodyClasses:['home']},config));
 }
 app.get('/', Home);
 app.post('/', Home);
@@ -434,7 +434,7 @@ app.use(express.static('public'));
 
 // 404
 app.use(function(req, res, next) {
-    res.status(404).render('not-found',_.extend({title:'404 non trouvé',bodyClasses:['404']},config));
+    res.status(404).render('not-found',_.defaults({title:'404 non trouvé',bodyClasses:['404']},config));
 });
 
 // Server
