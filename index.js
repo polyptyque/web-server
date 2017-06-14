@@ -36,6 +36,10 @@ if (!fs.existsSync(configFile)) {
 }
 
 var config = require(configFile);
+config.title = config.name;
+config.layout = 'main';
+config.scripts = [];
+config.bodyClasses = [];
 
 const PORT=config.PORT;
 
@@ -144,10 +148,10 @@ function postImage(req, res) {
 
                 var query = "INSERT INTO `shot` " +
                     "(`shot_id`, `uid`, `date`, " +
-                    "`user_firstname`, `user_lastname`, `user_email`, " +
+                    "`user_firstname`, `user_lastname`, `user_email`, `enabled`, " +
                     "`res1`, `res2`, `res3`, `res4`, `res5`, `res6`, `res7`, `res8`) " +
                     "VALUES (NULL, '"+uid+"', CURRENT_TIMESTAMP, " +
-                    "'"+firstname+"', '"+lastname+"', '"+email+"', " +
+                    "'"+firstname+"', '"+lastname+"', '"+email+"', TRUE, " +
                     "'"+responses.res1+"', " +
                     "'"+responses.res2+"', " +
                     "'"+responses.res3+"', " +
@@ -278,6 +282,17 @@ function MixImages(req, res, next){
 app.use('/mixes',express.static('mixes'));
 app.use('/mixes/:A-:B-:n.jpg',MixImages);
 
+// List all shots
+function ListAllShots(req,res,next){
+    connection.connect();
+    connection.query("SELECT * FROM `relation` WHERE `enabled` = 1", function(err, results){
+        if(err) return req.status(500).send("MySQLError:",err.toString());
+        res.render('list-all', _(config).extend({results:results, scripts:["list-all.js"], bodyClasses:['list-all']}))
+    });
+    connection.end();
+}
+app.get('/list-all', ListAllShots);
+
 // Demo
 function Demo(req, res, next) {
     console.log('Demo. '+req.originalUrl);
@@ -287,7 +302,7 @@ function Demo(req, res, next) {
     if(A && B){
         imgBaseUrl = 'mixes/'+A+'-'+B+'-';
     }
-    res.render('demo', _(config).extend({imgBaseUrl:imgBaseUrl, layout: 'main',title:config.name, scripts:["demo.js"], bodyClasses:['demo']}));
+    res.render('demo', _(config).extend({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo']}));
 }
 app.get('/demo', Demo);
 app.get('/demo-mix-:a-:b', Demo);
@@ -297,7 +312,7 @@ function Preview(req, res, next) {
     console.log('Demo. '+req.originalUrl);
     var imgBaseUrl = 'img/demo/',
         uid = req.params.uid;
-    res.render('preview', _(config).extend({uid:uid, layout: 'main',title:config.name, scripts:["preview.js"], bodyClasses:['demo']}));
+    res.render('preview', _(config).extend({uid:uid,scripts:["preview.js"], bodyClasses:['demo']}));
 }
 app.get('/preview', Preview);
 app.get('/preview-:uid', Preview);
@@ -307,7 +322,7 @@ app.get('/preview-:uid', Preview);
 function Home(req, res, next) {
     console.log('Home.');
     console.log(req.body);
-    res.render('home', _(config).extend({layout: 'main',title:config.name, scripts:scripts, bodyClasses:['home']}));
+    res.render('home', _(config).extend({scripts:scripts, bodyClasses:['home']}));
 }
 app.get('/', Home);
 app.post('/', Home);
@@ -319,7 +334,7 @@ app.use(express.static('public'));
 
 // 404
 app.use(function(req, res, next) {
-    res.status(404).render('not-found',_(config).extend({layout:'main',title:'404 non trouvé',scripts:[],bodyClasses:['404']}));
+    res.status(404).render('not-found',_(config).extend({title:'404 non trouvé',bodyClasses:['404']}));
 });
 
 // Server
