@@ -400,12 +400,12 @@ function Demo(req, res, next) {
         A = req.params.a,
         B = req.params.b;
     if(A && B){
-        imgBaseUrl = 'mixes/'+A+'-'+B+'-';
+        imgBaseUrl = 'mixes/'+A+'/'+B+'/';
     }
     res.render('demo', _.extend({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo']},config));
 }
 app.get('/demo', Demo);
-app.get('/demo-mix-:a-:b', Demo);
+app.get('/demo-mix/:a/:b', Demo);
 
 // Demo
 function Preview(req, res, next) {
