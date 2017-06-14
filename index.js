@@ -300,13 +300,13 @@ function MixImages(req, res, next){
     var A = req.params.A,
         B = req.params.B,
         n = req.params.n,
-        iEx = /([lr]?)(\d)/.exec(n),
-        side = iEx[1],
-        g = parseInt(iEx[2]),
-        opacity = Math.round(100-g*11.1111),
-        iOffset = side == 'r' ? -9 : 10,
-        i = Math.abs(g+iOffset);
-    console.log(side,i,iOffset,opacity);
+        i = parseInt(n),
+        side = i<9,
+        g = Math.abs(i-9),
+        opacity = Math.round(100-g*11.1111);
+        //iOffset = side == 'r' ? -9 : 10,
+        //i = Math.abs(g+iOffset);
+    console.log(i,side,opacity);
 
     var imgReady = 0,
         imgSrcBase = './uploads/',
@@ -330,19 +330,16 @@ function MixImages(req, res, next){
     }
 
     function Blend(){
-        var fromCtx,fromCanvas,toCtx,toCanvas;
-        if(side == 'l'){
-            fromCtx = ctxA;
+        var fromCanvas,toCtx,toCanvas;
+        if(side){
             fromCanvas = canvasA;
             toCtx = ctxB;
             toCanvas = canvasB;
         }else{
-            fromCtx = ctxB;
             fromCanvas = canvasB;
             toCtx = ctxA;
             toCanvas = canvasA;
         }
-        console.log(opacity);
         toCtx.globalAlpha = opacity/100;
         toCtx.globalCompositeOperation = 'darker';
         toCtx.drawImage(fromCanvas,0,0);
