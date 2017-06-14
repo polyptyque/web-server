@@ -53,13 +53,37 @@ if (!fs.existsSync(thumbsDir)) {
     fs.mkdirSync(thumbsDir);
 }
 
+function initializeConnection() {
+    var options = {
+        host     : config.mysql.host,
+        user     : config.mysql.user,
+        password : config.mysql.password,
+        database : config.mysql.database
+    };
+    function addDisconnectHandler(connection) {
+        connection.on("error", function (error) {
+            if (error instanceof Error) {
+                if (error.code === "PROTOCOL_CONNECTION_LOST") {
+                    console.error(error.stack);
+                    console.log("Lost connection. Reconnecting...");
+
+                    initializeConnection(connection.config);
+                } else if (error.fatal) {
+                    throw error;
+                }
+            }
+        });
+    }
+
+    var connection = mysql.createConnection(options);
+
+    // Add handlers.
+    addDisconnectHandler(connection);
+
+    connection.connect();
+    return connection;
+}
 //
-var connection = mysql.createConnection({
-    host     : config.mysql.host,
-    user     : config.mysql.user,
-    password : config.mysql.password,
-    database : config.mysql.database
-});
 //
 
 // express handlerbars template
@@ -148,7 +172,7 @@ function postImage(req, res) {
                 //
                 console.log("extract complete", code);
                 if(code != 0) return res.status(500).send("extract failure");
-                connection.connect();
+                var connection = initializeConnection();
 
                 var query = "INSERT INTO `shot` " +
                     "(`shot_id`, `uid`, `date`, " +
@@ -350,7 +374,7 @@ app.use('/mixes/thumbs/preview-:uid.jpg',ThumbsPreview);
 
 // List all shots
 function ListAllShots(req,res,next){
-    connection.connect();
+    var connection = initializeConnection();
     connection.query("SELECT * FROM `shot` WHERE `enabled` = 1", function(err, results){
         if(err) return res.status(500).send("MySQLError:",err.toString());
         res.render('list-all', _(config).extend({results:results, scripts:["list-all.js"], bodyClasses:['list-all']}))
