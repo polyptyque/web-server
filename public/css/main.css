@@ -5963,12 +5963,16 @@ footer {
   animation-name: preview;
   -webkit-animation-duration: 2s;
   animation-duration: 2s;
+  -webkit-animation-timing-function: steps(18);
+  animation-timing-function: steps(18);
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  -webkit-animation-direction: reverse;
+  animation-direction: reverse;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
-  -webkit-animation-timing-function: step-start;
-  animation-timing-function: step-start;
-  -webkit-animation-direction: reverse;
-  animation-direction: reverse; }
+  background-size: auto 100%;
+  float: left; }
   .list-all .list-item picture:after {
     position: relative;
     content: ' ';

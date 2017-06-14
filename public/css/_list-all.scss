@@ -15,9 +15,12 @@ $x : 100% / $n;
       width:100%;
       @include animation-name(preview);
       @include animation-duration(2s);
-      @include animation-fill-mode(both);
-      @include animation-timing-function(step-start);
+      @include animation-timing-function(steps($n));
+      @include animation-iteration-count(infinite);
       @include animation-direction(reverse);
+      @include animation-fill-mode(both);
+      background-size: auto 100%;
+      float:left;
 
       &:after{
         position: relative;
