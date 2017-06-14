@@ -400,7 +400,7 @@ function Demo(req, res, next) {
         A = req.params.a,
         B = req.params.b;
     if(A && B){
-        imgBaseUrl = 'mixes/'+A+'/'+B+'/';
+        imgBaseUrl = '/mixes/'+A+'/'+B+'/';
     }
     res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo']},config));
 }
