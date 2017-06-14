@@ -1,9 +1,9 @@
 jQuery(document).ready(function($){
 
-    var position = 10,
-        min = 1,
-        center = 10,
-        max = 19,
+    var min = 0,
+        center = 9,
+        position = center,
+        max = 18,
         side = max-center,
         width, height, ratio,
         wrapper = $('.demo-wrapper'),
@@ -81,10 +81,7 @@ jQuery(document).ready(function($){
     }
 
     function LoadImage(i,callback){
-        var n = i == center ? '0':
-                i < center ? 'r' + (center-i) :
-                             'l' + (i-center),
-            imgUrl = imgBaseUrl+n+'.jpg',
+        var imgUrl = imgBaseUrl+i+'.jpg',
             img = new Image();
         function onLoad(e){
             if(e.type == "error") return;
