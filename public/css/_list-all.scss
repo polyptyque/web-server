@@ -1,0 +1,25 @@
+$n : 18;
+$x : 100% / $n;
+@keyframes preview {
+  @for $i from 0 to $n {
+    $current-frame: ($i * $x);
+    #{$current-frame} {
+      background-position: $current-frame 0;
+    }
+  }
+}
+.list-all{
+  .list-item{
+    picture{
+      position: relative;
+      width:100%;
+      @include animation(preview 2s);
+      &:after{
+        position: relative;
+        content:' ';
+        display: block;
+        padding-top:percentage(1280/720);
+      }
+    }
+  }
+}

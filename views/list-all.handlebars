@@ -1,9 +1,13 @@
+<div class="container">
 {{#each results}}
-    <div>
+    <div class="list-item col-md-3 col-sm-4 col-xs-6">
         <a href="/preview-{{uid}}">
-            <img src="/mixes/thumbs/preview-{{uid}}.jpg" />
-            {{id}} {{uid}} {{date}}
+            <picture class="preview" style="background-image:url(/mixes/thumbs/preview-{{uid}}.jpg)" >
+
+            </picture>
+            <div>{{uid}} {{date}}</div>
+            <div>{{user_firstname}} {{user_lastname}} </div>
         </a>
-        <p>{{user_firstname}} {{user_lastname}} </p>
     </div>
 {{/each}}
+</div>

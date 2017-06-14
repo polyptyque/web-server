@@ -5919,6 +5919,55 @@ footer {
     color: #e53428;
     text-transform: uppercase; }
 
+@keyframes preview {
+  0% {
+    background-position: 0% 0; }
+  5.55556% {
+    background-position: 5.55556% 0; }
+  11.11111% {
+    background-position: 11.11111% 0; }
+  16.66667% {
+    background-position: 16.66667% 0; }
+  22.22222% {
+    background-position: 22.22222% 0; }
+  27.77778% {
+    background-position: 27.77778% 0; }
+  33.33333% {
+    background-position: 33.33333% 0; }
+  38.88889% {
+    background-position: 38.88889% 0; }
+  44.44444% {
+    background-position: 44.44444% 0; }
+  50% {
+    background-position: 50% 0; }
+  55.55556% {
+    background-position: 55.55556% 0; }
+  61.11111% {
+    background-position: 61.11111% 0; }
+  66.66667% {
+    background-position: 66.66667% 0; }
+  72.22222% {
+    background-position: 72.22222% 0; }
+  77.77778% {
+    background-position: 77.77778% 0; }
+  83.33333% {
+    background-position: 83.33333% 0; }
+  88.88889% {
+    background-position: 88.88889% 0; }
+  94.44444% {
+    background-position: 94.44444% 0; } }
+.list-all .list-item picture {
+  position: relative;
+  width: 100%;
+  -webkit-animation: preview 2s;
+  -o-animation: preview 2s;
+  animation: preview 2s; }
+  .list-all .list-item picture:after {
+    position: relative;
+    content: ' ';
+    display: block;
+    padding-top: 177.77778%; }
+
 .polypoto-title {
   position: relative;
   padding: 20px;
