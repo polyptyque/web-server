@@ -90,6 +90,7 @@ function postImage(req, res) {
         // form;
 
 
+            console.log("postImage");
             //
             // uid
             // form
@@ -110,7 +111,7 @@ function postImage(req, res) {
                         return "none";
                     });
             }catch(err){
-                return res.status(500).send("erreur dans les champs du formulaire. \n"+err.toString());
+                return res.status(500).send("erreur dans les champs du formulaire: \n"+err.toString());
             }
 
             if (signature != sha1(config.private_key+uid))
@@ -120,11 +121,14 @@ function postImage(req, res) {
                 fs.mkdirSync(dirPath);
             }
 
+            console.log("start extract",archivePath,uploadDir);
+
             targz().extract(archivePath,uploadDir).then(function(){
                 //res.send('archive extract success');
                 //
                 // INSERT INTO `shot` (`shot_id`, `uid`, `date`, `user_firstname`, `user_lastname`, `user_email`, `res1`, `res2`, `res3`, `res4`, `res5`, `res6`, `res7`, `res8`) VALUES (NULL, 'test_uid', CURRENT_TIMESTAMP, 'arthur', 'violy', 'arthur@violy.net', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
                 //
+                console.log("extract complete");
                 connection.connect();
 
                 var query = "INSERT INTO `shot` " +
