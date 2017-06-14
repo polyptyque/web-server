@@ -1,13 +1,14 @@
-<div class="container">
+<div class="list-all container">
 {{#each results}}
     <div class="list-item col-md-3 col-sm-4 col-xs-6">
         <a href="/preview-{{uid}}">
             <picture class="preview" style="background-image:url(/mixes/thumbs/preview-{{uid}}.jpg)" >
 
             </picture>
-            <div>{{uid}} {{date}}</div>
+            <div>{{date}}</div>
             <div>{{user_firstname}} {{user_lastname}} </div>
         </a>
+        <pre class="bg-danger">{{uid}}</pre>
     </div>
 {{/each}}
 </div>
