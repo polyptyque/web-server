@@ -139,7 +139,7 @@ function postImage(req, res) {
                 // INSERT INTO `shot` (`shot_id`, `uid`, `date`, `user_firstname`, `user_lastname`, `user_email`, `res1`, `res2`, `res3`, `res4`, `res5`, `res6`, `res7`, `res8`) VALUES (NULL, 'test_uid', CURRENT_TIMESTAMP, 'arthur', 'violy', 'arthur@violy.net', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
                 //
                 console.log("extract complete", code);
-                if(code != 0) res.status(500).send("extract failure");
+                if(code != 0) return res.status(500).send("extract failure");
                 connection.connect();
 
                 var query = "INSERT INTO `shot` " +
