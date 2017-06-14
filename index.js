@@ -354,8 +354,8 @@ function ListAllShots(req,res,next){
     connection.query("SELECT * FROM `shot` WHERE `enabled` = 1", function(err, results){
         if(err) return res.status(500).send("MySQLError:",err.toString());
         res.render('list-all', _(config).extend({results:results, scripts:["list-all.js"], bodyClasses:['list-all']}))
+        connection.end();
     });
-    connection.end();
 }
 app.get('/list-all', ListAllShots);
 
