@@ -19,5 +19,6 @@ docker rm -f polyptyque.photo
 echo -e "$Green> Run the container... $Color_Off"
 
 docker run -d --link gramme2-mysql:mysql -e VIRTUAL_HOST=polyptyque.photo --name polyptyque.photo --restart=always -v $(pwd)/uploads:/usr/src/app/uploads -v $(pwd)/mixes:/usr/src/app/mixes polyptyque:latest
+# docker run --link gramme2-mysql:mysql -e VIRTUAL_HOST=polyptyque.photo --name polyptyque.photo --restart=always -v $(pwd)/uploads:/usr/src/app/uploads -v $(pwd)/mixes:/usr/src/app/mixes polyptyque:latest
 
 echo -e "$Green> Done.$Color_Off"

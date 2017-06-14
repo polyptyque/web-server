@@ -2,6 +2,7 @@
 var fs = require('fs.extra');
 var util = require('util');
 var _ = require('underscore');
+var spawn = require( 'child_process' ).spawn;
 
 // express js app
 var express = require('express');
@@ -122,13 +123,22 @@ function postImage(req, res) {
             }
 
             console.log("start extract",archivePath,uploadDir);
+            var extractTarGz = spawn( 'tar', [ '-xzvf', archivePath ])
 
-            targz().extract(archivePath,uploadDir).then(function(){
+            extractTarGz.stdout.on( 'data', function(data) {
+                    console.log( 'stdout: ',data);
+            });
+
+            extractTarGz.stderr.on( 'data', function(data) {
+                console.log( 'stderr: ',data);
+            });
+
+            extractTarGz.on('close',function(code){
                 //res.send('archive extract success');
                 //
                 // INSERT INTO `shot` (`shot_id`, `uid`, `date`, `user_firstname`, `user_lastname`, `user_email`, `res1`, `res2`, `res3`, `res4`, `res5`, `res6`, `res7`, `res8`) VALUES (NULL, 'test_uid', CURRENT_TIMESTAMP, 'arthur', 'violy', 'arthur@violy.net', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
                 //
-                console.log("extract complete");
+                console.log("extract complete", code);
                 connection.connect();
 
                 var query = "INSERT INTO `shot` " +
@@ -183,8 +193,6 @@ function postImage(req, res) {
                     //console.log('The solution is: ', results[0].solution);
                 });
 
-            }).catch(function(){
-                res.status(500).send('archive extract fail')
             });
 
     }catch(err){
