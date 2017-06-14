@@ -36,8 +36,8 @@ jQuery(document).ready(function($){
         var pattern = patterns[i];
         if(!pattern) {
             var img = images[i],
-                imgWidth = img.naturalWidth,
-                imgHeight = img.naturalHeight;
+                imgWidth = img.naturalWidth || 720,
+                imgHeight = img.naturalHeight || 1280;
             console.log(img.src, imgWidth, imgHeight);
             ctx.clearRect(0,0,width,height);
             var imgRatio = imgWidth/imgHeight,
@@ -86,8 +86,20 @@ jQuery(document).ready(function($){
             img = new Image();
         console.log(imgUrl);
         function onLoad(e){
-            if(e.type == "error") return;
-            images[i] = img;
+            if(e.type == "error"){
+                var defaultCanvas = document.createElement('canvas');
+                defaultCanvas.width = 720;
+                defaultCanvas.height = 1280;
+                var ctx = canvas.getContext("2d");
+                ctx.rect(0, 0, defaultCanvas.width, defaultCanvas.height);
+                ctx.fillStyle = "red";
+                ctx.fill();
+                ctx.rect(20, 20, defaultCanvas.width-40, defaultCanvas.height-40);
+                ctx.fillStyle = "black";
+                ctx.fill();
+            }else{
+                images[i] = img;
+            }
             if(i<max){
                 LoadImage(i+1,callback);
             }else{
