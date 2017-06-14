@@ -231,13 +231,14 @@ function ThumbsPreview(req,res,next){
 
             if(imgReady == 0){
                 thumbWidth = Math.round(img.width*thumbsScale),
-                    thumbHeight = Math.round(img.height*thumbsScale),
-                    canvasWidth = thumbWidth*thumbsTotal,
-                    canvasHeight = thumbHeight*thumbsTotal
+                thumbHeight = Math.round(img.height*thumbsScale),
+                canvasWidth = thumbWidth*thumbsTotal,
+                canvasHeight = thumbHeight;
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+                console.log('canvas size',thumbWidth,thumbHeight,canvasWidth,canvasHeight);
             }
 
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
             ctx.drawImage(img, imgReady*thumbWidth, 0, thumbWidth, thumbHeight);
             imgReady ++;
             if(imgReady == 19){
@@ -253,7 +254,7 @@ function ThumbsPreview(req,res,next){
         var stream = canvas.jpegStream({bufsize: 4096, quality: 75, progressive:false});
         stream.pipe(res);
 
-        var fileCachePath = '/mixes/thumbs/preview-'+uid+'.jpg',
+        var fileCachePath = './mixes/thumbs/preview-'+uid+'.jpg',
             streamFile = canvas.jpegStream({bufsize: 4096, quality: 75, progressive:false}),
             cache = fs.createWriteStream(fileCachePath);
 

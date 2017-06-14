@@ -1,6 +1,9 @@
 {{#each results}}
     <div>
-        <a href="/preview-{{uid}}">{{id}} {{uid}} {{date}}</a>
+        <a href="/preview-{{uid}}">
+            <img src="/mixes/thumbs/preview-{{uid}}.jpg" />
+            {{id}} {{uid}} {{date}}
+        </a>
         <p>{{user_firstname}} {{user_lastname}} </p>
     </div>
 {{/each}}
