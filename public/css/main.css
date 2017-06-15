@@ -5920,11 +5920,14 @@ footer {
     text-transform: uppercase; }
 
 @keyframes preview {
+  0% {
+    background-position: 0% 0; }
   100% {
     background-position: -100% 0; } }
 .list-all .list-item picture {
   position: relative;
   width: 100%;
+  background-position: 0% 0;
   -webkit-animation: preview 4s steps(18) infinite;
   -o-animation: preview 4s steps(18) infinite;
   animation: preview 4s steps(18) infinite;
