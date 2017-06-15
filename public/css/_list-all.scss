@@ -1,24 +1,12 @@
-$n : 18;
-$x : 100% / $n;
 @keyframes preview {
-  @for $i from 0 to $n {
-    $current-frame: ($i * $x);
-    #{$current-frame} {
-      background-position: $current-frame 0;
-    }
-  }
+  100% { background-position: -100% 0; }
 }
 .list-all{
   .list-item{
     picture{
       position: relative;
       width:100%;
-      @include animation-name(preview);
-      @include animation-duration(2s);
-      @include animation-timing-function(steps($n));
-      @include animation-iteration-count(infinite);
-      @include animation-direction(reverse);
-      @include animation-fill-mode(both);
+      @include animation(preview 2s steps(19) infinite);
       background-size: auto 100%;
       float:left;
 
