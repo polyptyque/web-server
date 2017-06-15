@@ -5925,9 +5925,13 @@ footer {
 .list-all .list-item picture {
   position: relative;
   width: 100%;
-  -webkit-animation: preview 2s steps(19) infinite;
-  -o-animation: preview 2s steps(19) infinite;
-  animation: preview 2s steps(19) infinite;
+  -webkit-animation: preview 4s steps(18) infinite;
+  -o-animation: preview 4s steps(18) infinite;
+  animation: preview 4s steps(18) infinite;
+  -webkit-animation-direction: alternate;
+  animation-direction: alternate;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
   background-size: auto 100%;
   float: left; }
   .list-all .list-item picture:after {
