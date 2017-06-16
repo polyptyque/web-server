@@ -13,19 +13,7 @@ jQuery(document).ready(function($){
         canvas = $canvas.get(0),
         ctx = canvas.getContext('2d'),
         images = [],
-        patterns = [],
-        shortUrl = wrapper.data('shortUrl') || false;
-
-    if(shortUrl){
-        setInterval(function(){
-            $.get({
-                url:'/'+shortUrl,
-                contentType:'application/json'
-            }).done(function(data){
-                console.log(data);
-            });
-        },60000);
-    }
+        patterns = [];
 
     function Setup(){
         LoadImage(min,function(){

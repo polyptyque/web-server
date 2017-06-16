@@ -12,7 +12,22 @@ jQuery(document).ready(function($){
         canvas = $canvas.get(0),
         ctx = canvas.getContext('2d'),
         images = [],
-        patterns = [];
+        patterns = [],
+        shortUrl = wrapper.data('shortUrl') || false;
+
+    if(shortUrl){
+        setInterval(function(){
+            $.get({
+                url:'/'+shortUrl,
+                contentType:'application/json'
+            }).done(function(data){
+                console.log(data);
+                if(data.imgBaseUrl != imgBaseUrl){
+                    window.location.reload();
+                }
+            });
+        },30000);
+    }
 
     function Setup(){
         LoadImage(min,function(){
