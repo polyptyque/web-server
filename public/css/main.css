@@ -5928,6 +5928,9 @@ footer {
   position: relative;
   width: 100%;
   background-position: 0% 0;
+  width: 72px;
+  background-position: 0% 0;
+  margin: 0 10px 0 0;
   -webkit-animation: preview 4s steps(18) infinite;
   -o-animation: preview 4s steps(18) infinite;
   animation: preview 4s steps(18) infinite;

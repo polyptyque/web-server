@@ -6,8 +6,9 @@
   .list-item{
     picture{
       position: relative;
-      width:100%;
+      width: 72px;
       background-position: 0% 0;
+      margin: 0 10px 0 0;
       @include animation(preview 4s steps(18) infinite);
       @include animation-direction(alternate);
       @include animation-fill-mode(both);
