@@ -380,15 +380,6 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
 
     var shortenUid = req.params['0'];
 
-    connection.query("SELECT * FROM `shot` WHERE `enabled` = 1 SORT BY date DESC LIMIT 1", function(err, results, fields){
-        if(err){
-            console.log(err);
-            return res.status(500).send(err);
-        }
-        var latest = result[0];
-        connection.end();
-    });
-
     var sql = "SELECT * FROM `shot` WHERE `enabled` = 1 ";
 
     if(shortenUid != 'latest'){
@@ -397,7 +388,7 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
 
     sql+="SORT BY date DESC LIMIT 1";
 
-    console.log(sql);
+    console.log(shortenUid,sql);
 
     var connection = initializeConnection();
     connection.query(sql,function(err, results, fields){
