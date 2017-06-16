@@ -395,8 +395,10 @@ app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
                     console.log(err);
                     return res.status(500).send(err);
                 }
-                var max = results[0].value;
-                connection.query("SELECT value FROM `relation` WHERE `value` = "+max+" (`shot0` = "+Aid+" OR `shot1` = "+Aid+")", function(err, results, fields){
+                var max = results[0].value,
+                    query = "SELECT * FROM `relation` WHERE `value` = "+max+" AND (`shot0` = "+Aid+" OR `shot1` = "+Aid+")";
+                console.log(query);
+                connection.query(query, function(err, results, fields){
                     if(err){
                         console.log(err);
                         return res.status(500).send(err);
