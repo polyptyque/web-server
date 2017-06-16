@@ -382,16 +382,22 @@ app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
     connection.query("SELECT * FROM `shot` WHERE `uid` REGEXP '^.*"+shortenUid+"$'",function(err, results, fields){
         if(err){
             console.log(err);
-            return next();
+            return res.status(500).send(err);
         }
-        var result = results[0];
-        if(result){
-            res.json(result);
-        }else{
-            next();
+        try{
+            var result = results[0];
+            if(result){
+                res.json(result);
+            }else{
+                return res.status(500).send(results);
+            }
+        }catch (err){
+            return res.status(500).send(err);
         }
+        connection.end();
+
     });
-    next();
+    //next();
 });
 
 app.use('/mixes',express.static('mixes'));
