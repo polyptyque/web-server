@@ -387,7 +387,7 @@ app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
         try{
             var A = results[0];
             if(A){
-                var Aid = A.id,
+                var Aid = A.shot_id,
                     query = "SET @max = " +
                         "(SELECT value FROM `relation` WHERE `shot0` = "+Aid+" OR `shot1` = "+Aid+" ORDER by value DESC LIMIT 1);" +
                         "SELECT * FROM `relation` WHERE `value` = @max AND (`shot0` = "+Aid+" OR `shot1` = "+Aid+");";
