@@ -376,10 +376,31 @@ function MixImages(req, res, next){
     //res.status(500).end('In progress');
 }
 
-app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
+app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
+
     var shortenUid = req.params['0'];
+
+    connection.query("SELECT * FROM `shot` WHERE `enabled` = 1 SORT BY date DESC LIMIT 1", function(err, results, fields){
+        if(err){
+            console.log(err);
+            return res.status(500).send(err);
+        }
+        var latest = result[0];
+        connection.end();
+    });
+
+    var sql = "SELECT * FROM `shot` WHERE `enabled` = 1 ";
+
+    if(shortenUid != 'latest'){
+        sql += "AND `uid` REGEXP '^.*"+shortenUid+"$' ";
+    }
+
+    sql+="SORT BY date DESC LIMIT 1";
+
+    console.log(sql);
+
     var connection = initializeConnection();
-    connection.query("SELECT * FROM `shot` WHERE `uid` REGEXP '^.*"+shortenUid+"$'",function(err, results, fields){
+    connection.query(sql,function(err, results, fields){
         if(err){
             console.log(err);
             return res.status(500).send(err);
