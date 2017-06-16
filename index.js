@@ -412,9 +412,10 @@ app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
                             console.log(err);
                             return res.status(500).send(err);
                         }
-                        var B = results[0];
-                        res.json({query:query,A:A,B:B,results:results});
                         connection.end();
+                        var B = results[0],
+                            imgBaseUrl = '/mixes/'+A.uid+'/'+B.uid+'/';
+                        res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo']},config));
                     });
                 });
             });
