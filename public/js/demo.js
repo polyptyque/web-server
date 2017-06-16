@@ -116,7 +116,8 @@ jQuery(document).ready(function($){
             //console.log(event)
             if(alpha){
                 var axe = ratio < 1 ? gamma : beta;
-                var n = (Math.min(Math.max(-1,axe/-40),1)+1)/2;
+                var alpha = 30; // sensibilité
+                var n = (Math.min(Math.max(-1,axe/-alpha),1)+1)/2;
                 var id = Math.round(center + ((n-1/2)*side*2));
                 console.log(id,n)
                 SetImage(id);
