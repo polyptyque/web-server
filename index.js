@@ -375,6 +375,25 @@ function MixImages(req, res, next){
 
     //res.status(500).end('In progress');
 }
+
+app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
+    var shortenUid = req.params['0'];
+    var connection = initializeConnection();
+    connection.query("SELECT * FROM `shot` WHERE `uid` REGEXP '^.*"+shortenUid+"$'",function(err, results, fields){
+        if(err){
+            console.log(err);
+            return next();
+        }
+        var result = results[0];
+        if(result){
+            res.json(result);
+        }else{
+            next();
+        }
+    });
+    next();
+});
+
 app.use('/mixes',express.static('mixes'));
 app.use('/mixes/:A/:B/:n.jpg',MixImages);
 app.use('/mixes/thumbs/preview-:uid.jpg',ThumbsPreview);
