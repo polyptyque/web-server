@@ -380,6 +380,8 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
 
     var shortenUid = req.params['0'];
 
+    var useJsonResponse = req.headers['content-type'] == 'application/json';
+
     var sql = "SELECT * FROM `shot` WHERE `enabled` = 1 ";
 
     if(shortenUid != 'latest'){
@@ -427,7 +429,15 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                         connection.end();
                         var B = results[0],
                             imgBaseUrl = '/mixes/'+A.uid+'/'+B.uid+'/';
-                        res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo']},config));
+                        if(useJsonResponse){
+                            res.json({
+                                A:A,
+                                B:B,
+                                imgBaseUrl:imgBaseUrl
+                            })
+                        }else{
+                            res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo'], shortUrl:shortUrl},config));
+                        }
                     });
                 });
             });
@@ -463,7 +473,7 @@ function Demo(req, res, next) {
     if(A && B){
         imgBaseUrl = '/mixes/'+A+'/'+B+'/';
     }
-    res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo']},config));
+    res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo'], shortUrl:false},config));
 }
 app.get('/demo', Demo);
 app.get('/demo-mix/:a/:b', Demo);
