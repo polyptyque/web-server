@@ -388,9 +388,7 @@ app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
             var A = results[0];
             if(A){
                 var Aid = A.shot_id,
-                    query = "SET @max = " +
-                        "(SELECT value FROM `relation` WHERE `shot0` = "+Aid+" OR `shot1` = "+Aid+" ORDER by value DESC LIMIT 1); \n" +
-                        "SELECT * FROM `relation` WHERE `value` = @max AND (`shot0` = "+Aid+" OR `shot1` = "+Aid+");";
+                    query = "SELECT value FROM `relation` WHERE `shot0` = "+Aid+" OR `shot1` = "+Aid+" ORDER by value DESC LIMIT 1;";
                 console.log(A);
                 console.log(query);
                 connection.query(query, function(err, results, fields){
@@ -398,7 +396,7 @@ app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
                         console.log(err);
                         return res.status(500).send(err);
                     }
-                    res.json({query:query,from:A,relations:results});
+                    res.json({query:query,from:A,max:results});
                 });
             }else{
                 connection.end();
