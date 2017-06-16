@@ -385,13 +385,14 @@ app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
             return res.status(500).send(err);
         }
         try{
-            var A = results[0],
-                Aid = A.id,
-                query = "SET @max = " +
-                    "(SELECT value FROM `relation` WHERE `shot0` = "+Aid+" OR `shot1` = "+Aid+" ORDER by value DESC LIMIT 1);" +
-                    "SELECT * FROM `relation` WHERE `value` = @max AND (`shot0` = "+Aid+" OR `shot1` = "+Aid+");";
-            console.log(query);
+            var A = results[0];
             if(A){
+                var Aid = A.id,
+                    query = "SET @max = " +
+                        "(SELECT value FROM `relation` WHERE `shot0` = "+Aid+" OR `shot1` = "+Aid+" ORDER by value DESC LIMIT 1);" +
+                        "SELECT * FROM `relation` WHERE `value` = @max AND (`shot0` = "+Aid+" OR `shot1` = "+Aid+");";
+                console.log(A);
+                console.log(query);
                 connection.query(query, function(err, results, fields){
                     if(err){
                         console.log(err);
