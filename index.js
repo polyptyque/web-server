@@ -148,6 +148,8 @@ function postImage(req, res) {
                 return res.status(500).send("erreur dans les champs du formulaire: \n"+err.toString()+"\n\n"+JSON.stringify(req.body));
             }
 
+            var shortenId = /^[0-9]{6}-[0-9]{6}-([abcdef0-9]{6})$/.exec(uid)[1];
+
             if (signature != sha1(config.private_key+uid))
                 return res.status(500).send("signature invalide");
 
@@ -220,6 +222,12 @@ function postImage(req, res) {
                             if (err) return MysqlError(err);
                             res.json(results);
                             connection.end();
+                            if(email){
+                                var subject = "POLYPOTO : "+firstname+" retrouvez votre portrait !";
+                                var message = "Merci "+firstname+". Votre portrait est disponible à cette adresse : \n"+
+                                    "http://polyptyque.photo/"+shortenId+ ">";
+                                sendMail(email,subject,message,message);
+                            }
                         });
 
                     });
