@@ -3,6 +3,7 @@ var fs = require('fs.extra');
 var util = require('util');
 var _ = require('underscore');
 var spawn = require( 'child_process' ).spawn;
+var nodemailer = require('nodemailer');
 
 // express js app
 var express = require('express');
@@ -294,6 +295,41 @@ function ThumbsPreview(req,res,next){
     AddImage();
 
 }
+
+// Mail
+
+
+
+function sendMail(to,subject,text,html,callback){
+    // create reusable transporter object using the default SMTP transport
+    var transporter = nodemailer.createTransport(config.smtps);
+
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+        from: '"Polyptyque" <contact@polyptyque.photo>', // sender address
+        to: to, // list of receivers
+        subject: subject, // Subject line
+        text: text, // plaintext body
+        html: html // html body
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+        console.log('Message sent: ' + info.response);
+        if(callback){
+            callback();
+        }
+    });
+}
+
+app.use('/sendMail',function(req,res,next){
+    sendMail('Arthur Violy <arthur@violy.net>','to','text message','<i>html message</i>',function(){
+        res.send('message sended');
+    });
+});
 
 // Mix
 function MixImages(req, res, next){

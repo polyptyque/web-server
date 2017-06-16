@@ -8,5 +8,6 @@
     "user":"polypoto",
     "password":"secret",
     "database":"polypoto"
-  }
+  },
+  "smtps":"smtps://contact@polyptyque.photo:secretpassword@mail.gandi.net"
 }
