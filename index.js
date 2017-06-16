@@ -403,8 +403,19 @@ app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
                         console.log(err);
                         return res.status(500).send(err);
                     }
-                    res.json({query:query,from:A,results:results});
-                    connection.end();
+                    var relation = results[0],
+                        shot_idB = Aid == relation.shot0 ? relation.shot1 : relation.shot0;
+                    query = "SELECT * FROM `shot` WHERE `shot_id` = "+shot_idB+" LIMIT 1";
+                    console.log(query);
+                    connection.query(query, function(err,results,fields){
+                        if(err){
+                            console.log(err);
+                            return res.status(500).send(err);
+                        }
+                        var B = results[0];
+                        res.json({query:query,A:A,B:B,results:results});
+                        connection.end();
+                    });
                 });
             });
         }else{
