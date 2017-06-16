@@ -386,7 +386,7 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
         sql += "AND `uid` REGEXP '^.*"+shortenUid+"$' ";
     }
 
-    sql+="SORT BY date DESC LIMIT 1";
+    sql+="ORDER BY date DESC LIMIT 1";
 
     console.log(shortenUid,sql);
 
