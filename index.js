@@ -384,30 +384,31 @@ app.use(/\/([abcdef0-9]{6})$/,function(req,res,next){
             console.log(err);
             return res.status(500).send(err);
         }
-        try{
-            var A = results[0];
-            if(A){
-                var Aid = A.shot_id,
-                    query = "SELECT value FROM `relation` WHERE `shot0` = "+Aid+" OR `shot1` = "+Aid+" ORDER by value DESC LIMIT 1;";
-                console.log(A);
-                console.log(query);
-                connection.query(query, function(err, results, fields){
+        var A = results[0];
+        if(A){
+            var Aid = A.shot_id,
+                query = "SELECT value FROM `relation` WHERE `shot0` = "+Aid+" OR `shot1` = "+Aid+" ORDER by value DESC LIMIT 1;";
+            console.log(A);
+            console.log(query);
+            connection.query(query, function(err, results, fields){
+                if(err){
+                    console.log(err);
+                    return res.status(500).send(err);
+                }
+                var max = results[0].value;
+                connection.query("SELECT value FROM `relation` WHERE `value` = "+max+" (`shot0` = "+Aid+" OR `shot1` = "+Aid+")", function(err, results, fields){
                     if(err){
                         console.log(err);
                         return res.status(500).send(err);
                     }
-                    res.json({query:query,from:A,max:results});
+                    res.json({query:query,from:A,results:results});
+                    connection.end();
                 });
-            }else{
-                connection.end();
-                return res.status(500).send(results);
-            }
-        }catch (err){
+            });
+        }else{
             connection.end();
-            return res.status(500).send(err);
+            return next();
         }
-        connection.end();
-
     });
     //next();
 });
