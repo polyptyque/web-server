@@ -129,7 +129,14 @@ jQuery(document).ready(function($){
             //$('.gamma').text(gamma);
             //console.log(event)
             if(alpha){
-                var axe = ratio < 1 ? gamma : beta;
+                var axe = gamma;
+                switch(location.hash){
+                    case "#beta":  axe = beta; break;
+                    case "#alpha":  axe = alpha; break;
+                    case "#gamma":  axe = gamma; break;
+                }
+                console.log(location.hash)
+                //var axe = ratio < 1 ? gamma : beta;
                 var n = (Math.min(Math.max(-1,axe/-20),1)+1)/2;
                 var id = Math.round(center + ((n-1/2)*side*2));
                 console.log(id,n)
