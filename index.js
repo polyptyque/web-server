@@ -436,7 +436,7 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                                 imgBaseUrl:imgBaseUrl
                             })
                         }else{
-                            res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo'], shortUrl:shortUrl},config));
+                            res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo'], shortUrl:shortenUid},config));
                         }
                     });
                 });
