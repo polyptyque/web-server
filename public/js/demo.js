@@ -13,7 +13,7 @@ jQuery(document).ready(function($){
         ctx = canvas.getContext('2d'),
         images = [],
         patterns = [],
-        shortUrl = wrapper.data('shortUrl') || false;
+        shortUrl = wrapper.data('shorturl');
 
     if(shortUrl){
         setInterval(function(){
