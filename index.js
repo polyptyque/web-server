@@ -333,10 +333,11 @@ function sendMail(to,subject,text,html,callback){
     });
 }
 
-app.use('/sendMail',function(req,res,next){
-    sendMail('Arthur Violy <arthur@violy.net>','to','text message','<i>html message</i>',function(){
+app.use('/mailing',function(req,res,next){
+    res.render('mails/confirmation-html.handlebars',_.defaults({layout:'mail'},config))
+    /*sendMail('Arthur Violy <arthur@violy.net>','to','text message','<i>html message</i>',function(){
         res.send('message sended');
-    });
+    });*/
 });
 
 // Mix
@@ -426,10 +427,10 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
 
     var useJsonResponse = req.headers['content-type'] == 'application/json';
 
-    var sql = "SELECT * FROM `shot` WHERE `enabled` = 1 ";
+    var sql = "SELECT * FROM `shot` ";
 
     if(shortenUid != 'latest'){
-        sql += "AND `uid` REGEXP '^.*"+shortenUid+"$' ";
+        sql += " WHERE `enabled` = 1 AND `uid` REGEXP '^.*"+shortenUid+"$' ";
     }
 
     sql+="ORDER BY date DESC LIMIT 1";
