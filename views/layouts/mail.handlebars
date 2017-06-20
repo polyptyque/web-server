@@ -2,7 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>*|MC:SUBJECT|*</title>
+    <title>{{subject}}</title>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,500' rel='stylesheet' type='text/css'>
     <style type="text/css">
         /* /\/\/\/\/\/\/\/\/ CLIENT-SPECIFIC STYLES /\/\/\/\/\/\/\/\/ */
         #outlook a{padding:0;} /* Force Outlook to provide a "view in browser" message */
@@ -32,7 +33,7 @@
         * @theme page
         */
         body, #bodyTable{
-            /*@editable*/ background-color:#DEE0E2;
+            /*@editable*/ background-color:{{brandBeige}};
         }
 
         /**
@@ -42,7 +43,7 @@
         * @theme page
         */
         #bodyCell{
-            /*@editable*/ border-top:4px solid #BBBBBB;
+            /*@editable*/ border-top:4px solid {{brandRed}};
         }
 
         /**
@@ -51,7 +52,7 @@
         * @tip Set the border for your email.
         */
         #templateContainer{
-            /*@editable*/ border:1px solid #BBBBBB;
+            /*@editable*/ border:1px solid {{brandBeige}};
         }
 
         /**
@@ -61,12 +62,12 @@
         * @style heading 1
         */
         h1{
-            /*@editable*/ color:#202020 !important;
+            /*@editable*/ color:{{brandRed}} !important;
             display:block;
-            /*@editable*/ font-family:Helvetica;
+            /*@editable*/ font-family:'Montserrat',Helvetica;
             /*@editable*/ font-size:26px;
             /*@editable*/ font-style:normal;
-            /*@editable*/ font-weight:bold;
+            /*@editable*/ font-weight:500;
             /*@editable*/ line-height:100%;
             /*@editable*/ letter-spacing:normal;
             margin-top:0;
@@ -83,12 +84,12 @@
         * @style heading 2
         */
         h2{
-            /*@editable*/ color:#404040 !important;
+            /*@editable*/ color:{{brandGrey}} !important;
             display:block;
-            /*@editable*/ font-family:Helvetica;
+            /*@editable*/ font-family:'Montserrat',Helvetica;
             /*@editable*/ font-size:20px;
             /*@editable*/ font-style:normal;
-            /*@editable*/ font-weight:bold;
+            /*@editable*/ font-weight:500;
             /*@editable*/ line-height:100%;
             /*@editable*/ letter-spacing:normal;
             margin-top:0;
@@ -105,12 +106,11 @@
         * @style heading 3
         */
         h3{
-            /*@editable*/ color:#606060 !important;
+            /*@editable*/ color:{{brandGrey}} !important;
             display:block;
-            /*@editable*/ font-family:Helvetica;
+            /*@editable*/ font-family:'Montserrat',Helvetica;
             /*@editable*/ font-size:16px;
-            /*@editable*/ font-style:italic;
-            /*@editable*/ font-weight:normal;
+            /*@editable*/ font-weight:400;
             /*@editable*/ line-height:100%;
             /*@editable*/ letter-spacing:normal;
             margin-top:0;
@@ -127,12 +127,11 @@
         * @style heading 4
         */
         h4{
-            /*@editable*/ color:#808080 !important;
+            /*@editable*/ color:{{brandGrey}} !important;
             display:block;
-            /*@editable*/ font-family:Helvetica;
+            /*@editable*/ font-family:'Montserrat',Helvetica;
             /*@editable*/ font-size:14px;
-            /*@editable*/ font-style:italic;
-            /*@editable*/ font-weight:normal;
+            /*@editable*/ font-weight:400;
             /*@editable*/ line-height:100%;
             /*@editable*/ letter-spacing:normal;
             margin-top:0;
@@ -151,8 +150,8 @@
         * @theme header
         */
         #templatePreheader{
-            /*@editable*/ background-color:#F4F4F4;
-            /*@editable*/ border-bottom:1px solid #CCCCCC;
+            /*@editable*/ background-color:{{brandBeige}};
+            /*@editable*/ border-bottom:1px solid {{brandBeige}};
         }
 
         /**
@@ -161,8 +160,9 @@
         * @tip Set the styling for your email's preheader text. Choose a size and color that is easy to read.
         */
         .preheaderContent{
-            /*@editable*/ color:#808080;
-            /*@editable*/ font-family:Helvetica;
+            /*@editable*/ color:{{brandGrey}};
+            /*@editable*/ font-family:'Montserrat',Helvetica;
+            font-weight: 400;
             /*@editable*/ font-size:10px;
             /*@editable*/ line-height:125%;
             /*@editable*/ text-align:left;
@@ -174,7 +174,7 @@
         * @tip Set the styling for your email's preheader links. Choose a color that helps them stand out from your text.
         */
         .preheaderContent a:link, .preheaderContent a:visited, /* Yahoo! Mail Override */ .preheaderContent a .yshortcuts /* Yahoo! Mail Override */{
-            /*@editable*/ color:#606060;
+            /*@editable*/ color:{{brandGrey}};
             /*@editable*/ font-weight:normal;
             /*@editable*/ text-decoration:underline;
         }
@@ -186,9 +186,9 @@
         * @theme header
         */
         #templateHeader{
-            /*@editable*/ background-color:#F4F4F4;
-            /*@editable*/ border-top:1px solid #FFFFFF;
-            /*@editable*/ border-bottom:1px solid #CCCCCC;
+            /*@editable*/ background-color:{{brandBeige}};
+            /*@editable*/ border-top:1px solid {{brandBeige}};
+            /*@editable*/ border-bottom:1px solid {{brandBeige}};
         }
 
         /**
@@ -197,10 +197,10 @@
         * @tip Set the styling for your email's header text. Choose a size and color that is easy to read.
         */
         .headerContent{
-            /*@editable*/ color:#505050;
-            /*@editable*/ font-family:Helvetica;
+            /*@editable*/ color:{{brandGrey}};
+            /*@editable*/ font-family:'Montserrat',Helvetica;
             /*@editable*/ font-size:20px;
-            /*@editable*/ font-weight:bold;
+            /*@editable*/ font-weight:500;
             /*@editable*/ line-height:100%;
             /*@editable*/ padding-top:0;
             /*@editable*/ padding-right:0;
@@ -216,7 +216,7 @@
         * @tip Set the styling for your email's header links. Choose a color that helps them stand out from your text.
         */
         .headerContent a:link, .headerContent a:visited, /* Yahoo! Mail Override */ .headerContent a .yshortcuts /* Yahoo! Mail Override */{
-            /*@editable*/ color:#EB4102;
+            /*@editable*/ color:{{brandRed}};
             /*@editable*/ font-weight:normal;
             /*@editable*/ text-decoration:underline;
         }
@@ -234,9 +234,9 @@
         * @tip Set the background color and borders for your email's body area.
         */
         #templateBody{
-            /*@editable*/ background-color:#F4F4F4;
-            /*@editable*/ border-top:1px solid #FFFFFF;
-            /*@editable*/ border-bottom:1px solid #CCCCCC;
+            /*@editable*/ background-color:{{brandBeige}};
+            /*@editable*/ border-top:1px solid {{brandBeige}};
+            /*@editable*/ border-bottom:1px solid {{brandBeige}};
         }
 
         /**
@@ -246,8 +246,9 @@
         * @theme main
         */
         .bodyContent{
-            /*@editable*/ color:#505050;
-            /*@editable*/ font-family:Helvetica;
+            /*@editable*/ color:{{brandGrey}};
+            /*@editable*/ font-family:'Montserrat',Helvetica;
+            font-weight: 400;
             /*@editable*/ font-size:14px;
             /*@editable*/ line-height:150%;
             padding-top:20px;
@@ -263,7 +264,7 @@
         * @tip Set the styling for your email's main content links. Choose a color that helps them stand out from your text.
         */
         .bodyContent a:link, .bodyContent a:visited, /* Yahoo! Mail Override */ .bodyContent a .yshortcuts /* Yahoo! Mail Override */{
-            /*@editable*/ color:#EB4102;
+            /*@editable*/ color:{{brandRed}};
             /*@editable*/ font-weight:normal;
             /*@editable*/ text-decoration:underline;
         }
@@ -283,8 +284,8 @@
         * @theme footer
         */
         #templateFooter{
-            /*@editable*/ background-color:#F4F4F4;
-            /*@editable*/ border-top:1px solid #FFFFFF;
+            /*@editable*/ background-color:{{brandBeige}};
+            /*@editable*/ border-top:1px solid {{brandBeige}};
         }
 
         /**
@@ -294,9 +295,10 @@
         * @theme footer
         */
         .footerContent{
-            /*@editable*/ color:#808080;
-            /*@editable*/ font-family:Helvetica;
-            /*@editable*/ font-size:10px;
+            /*@editable*/ color:{{brandGrey}};
+            /*@editable*/ font-family:'Montserrat',Helvetica;
+            font-weight: 400;
+            /*@editable*/ font-size:12px;
             /*@editable*/ line-height:150%;
             padding-top:20px;
             padding-right:20px;
@@ -311,7 +313,7 @@
         * @tip Set the styling for your email's footer links. Choose a color that helps them stand out from your text.
         */
         .footerContent a:link, .footerContent a:visited, /* Yahoo! Mail Override */ .footerContent a .yshortcuts, .footerContent a span /* Yahoo! Mail Override */{
-            /*@editable*/ color:#606060;
+            /*@editable*/ color:{{brandGrey}};
             /*@editable*/ font-weight:normal;
             /*@editable*/ text-decoration:underline;
         }
@@ -440,31 +442,28 @@
             <td align="center" valign="top" id="bodyCell">
                 <!-- BEGIN TEMPLATE // -->
                 <table border="0" cellpadding="0" cellspacing="0" id="templateContainer">
+                    {{#ifexists preview}}
                     <tr>
                         <td align="center" valign="top">
                             <!-- BEGIN PREHEADER // -->
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templatePreheader">
                                 <tr>
                                     <td valign="top" class="preheaderContent" style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:20px;" mc:edit="preheader_content00">
-                                        Use this area to offer a short teaser of your email's content. Text here will show in the preview area of some email clients.
+                                        {{preview}}
                                     </td>
-                                    <!-- *|IFNOT:ARCHIVE_PAGE|* -->
-                                    <td valign="top" width="180" class="preheaderContent" style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:0;" mc:edit="preheader_content01">
-                                        Email not displaying correctly?<br /><a href="*|ARCHIVE|*" target="_blank">View it in your browser</a>.
-                                    </td>
-                                    <!-- *|END:IF|* -->
                                 </tr>
                             </table>
                             <!-- // END PREHEADER -->
                         </td>
                     </tr>
+                    {{/ifexists}}
                     <tr>
                         <td align="center" valign="top">
                             <!-- BEGIN HEADER // -->
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateHeader">
                                 <tr>
                                     <td valign="top" class="headerContent">
-                                        <img src="http://gallery.mailchimp.com/2425ea8ad3/images/header_placeholder_600px.png" style="max-width:600px;" id="headerImage" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext />
+                                        <img src="http://localhost:7777/img/polypoto/mail-header-polypoto.jpg" style="max-width:600px;" id="headerImage" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext />
                                     </td>
                                 </tr>
                             </table>
@@ -490,7 +489,7 @@
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateFooter">
                                 <tr>
                                     <td valign="top" class="footerContent" mc:edit="footer_content00">
-                                        <a href="https://twitter.com/PolyptyquePhoto">Suivez-nous sur Twitter</a>&nbsp;&nbsp;&nbsp;<a href="http://polyptyque.photo"><img src="https://polyptyque."Plus d’informations</a>&nbsp;&nbsp;&nbsp;
+                                        <a href="http://polyptyque.photo"><img src="http://localhost:7777/favicons/android-icon-36x36.png" width="18" height="18" align="top" />Plus d’informations</a>&nbsp;&nbsp;&nbsp;<a href="https://twitter.com/PolyptyquePhoto">Suivez-nous sur Twitter</a>&nbsp;&nbsp;&nbsp;
                                     </td>
                                 </tr>
                             </table>

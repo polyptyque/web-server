@@ -99,6 +99,13 @@ var hbs = exphbs.create({
                 //console.log('ifvalue NO',conditional,'==',options.hash.value);
                 return options.inverse(this);
             }
+        },
+        ifexists:function (conditional, options) {
+            console.log(conditional)
+            if (options.hash.value) {
+                //console.log('ifvalue YES',conditional,'==',options.hash.value);
+                return options.fn(this)
+            }
         }
     }
 });
@@ -334,7 +341,13 @@ function sendMail(to,subject,text,html,callback){
 }
 
 app.use('/mailing',function(req,res,next){
-    res.render('mails/confirmation-html.handlebars',_.defaults({layout:'mail'},config))
+    res.render('mails/confirmation-html.handlebars',_.defaults({
+        layout:'mail',
+        brandBeige:'#fff0c3',
+        brandRed: '#e53428',
+        brandGrey:'#646464',
+        subject:'test subject'
+    },config))
     /*sendMail('Arthur Violy <arthur@violy.net>','to','text message','<i>html message</i>',function(){
         res.send('message sended');
     });*/
