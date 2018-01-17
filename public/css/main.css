@@ -5926,8 +5926,6 @@ footer {
     background-position: -100% 0; } }
 .list-all .list-item picture {
   position: relative;
-  width: 100%;
-  background-position: 0% 0;
   width: 72px;
   background-position: 0% 0;
   margin: 0 10px 0 0;
@@ -5997,6 +5995,9 @@ footer {
 @media (max-width: 768px) {
   .polypoto .p-2 {
     font-size: 18px; } }
+
+.twitter-video {
+  margin: auto !important; }
 
 html, body {
   width: 100%;
