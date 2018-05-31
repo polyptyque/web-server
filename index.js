@@ -36,7 +36,8 @@ if (!fs.existsSync(configFile)) {
     return;
 }
 
-var config = require(configFile);
+var config = require(configFile),
+    baseScripts = ['/js/jquery-3.2.0.min.js','/js/bootstrap.min.js','/js/underscore-min.js'];
 config.title = config.name;
 config.layout = 'main';
 config.scripts = [];
@@ -112,7 +113,7 @@ var hbs = exphbs.create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.enable('view cache');
-var scripts = ["main.js"];
+var scripts = [];
 
 var response_fields_mapping = {
     res1:'temper',
@@ -494,7 +495,13 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                                 imgBaseUrl:imgBaseUrl
                             })
                         }else{
-                            res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo'], shortUrl:shortenUid},config));
+                            ;
+                            res.render('demo', _.defaults({
+                                imgBaseUrl:imgBaseUrl,
+                                scripts:_.union(baseScripts,'/js/demo.js'),
+                                bodyClasses:['demo'],
+                                shortUrl:shortenUid},config)
+                            );
                         }
                     });
                 });
@@ -516,7 +523,11 @@ function ListAllShots(req,res,next){
     var connection = initializeConnection();
     connection.query("SELECT * FROM `shot` WHERE `enabled` = 1", function(err, results){
         if(err) return res.status(500).send("MySQLError:",err.toString());
-        res.render('list-all', _.defaults({results:results, scripts:["list-all.js"], bodyClasses:['list-all']},config))
+        res.render('list-all', _.defaults({
+            results:results,
+            scripts:_.union(baseScripts,'/js/list-all.js'),
+            bodyClasses:['list-all']
+        },config))
         connection.end();
     });
 }
@@ -531,7 +542,12 @@ function Demo(req, res, next) {
     if(A && B){
         imgBaseUrl = '/mixes/'+A+'/'+B+'/';
     }
-    res.render('demo', _.defaults({imgBaseUrl:imgBaseUrl, scripts:["demo.js"], bodyClasses:['demo'], shortUrl:false},config));
+    res.render('demo', _.defaults({
+        imgBaseUrl:imgBaseUrl,
+        scripts:_.union(baseScripts,'/js/demo.js'),
+        bodyClasses:['demo'],
+        shortUrl:false
+    },config));
 }
 app.get('/demo', Demo);
 app.get('/demo-mix/:a/:b', Demo);
@@ -541,7 +557,11 @@ function Preview(req, res, next) {
     console.log('Demo. '+req.originalUrl);
     var imgBaseUrl = 'img/demo/',
         uid = req.params.uid;
-    res.render('preview', _.defaults({uid:uid,scripts:["preview.js"], bodyClasses:['demo']},config));
+    res.render('preview', _.defaults({
+        uid:uid,
+        scripts:_.union(baseScripts,'/js/preview.js'),
+        bodyClasses:['demo']
+    },config));
 }
 app.get('/preview', Preview);
 app.get('/preview-:uid', Preview);
@@ -550,11 +570,19 @@ app.get('/preview-:uid', Preview);
 // Home
 function Home(req, res, next) {
     console.log('Home.');
-    console.log(req.body);
-    res.render('home', _.defaults({scripts:scripts, bodyClasses:['home']},config));
+    res.render('home', _.defaults({
+        bodyClasses:['home','centered-layout','header-absolute']},config));
 }
 app.get('/', Home);
 app.post('/', Home);
+
+
+// Polypoto
+function Polypoto(req, res, next) {
+    console.log('Polypoto.');
+    res.render('polypoto', _.defaults({bodyClasses:['polypoto','centered-layout']},config));
+}
+app.use('/polypoto', Polypoto);
 
 // static public
 app.use('/uploads',express.static('uploads'));

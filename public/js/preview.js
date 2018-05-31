@@ -110,11 +110,6 @@ jQuery(document).ready(function($){
         img.addEventListener('error',onLoad);
         img.src = imgUrl;
     }
-    // $(window).on('mousemove',function(e){
-    //     var n = e.pageX/wrapper.width(),
-    //         id = Math.round(center + ((n-1/2)*side*2));
-    //     SetImage(id);
-    // });
     if (window.DeviceMotionEvent==undefined) {
         // pas de support de devicemotion
         //console.log('mouse');

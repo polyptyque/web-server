@@ -1,0 +1,19 @@
+//
+@import "variables";
+//
+.home{
+  header{
+    display: none;
+  }
+  .full-size.logo-typo{
+    width:100%;
+    margin-left: 0;
+  }
+  .print-small{
+    width:4cm;
+    height:auto;
+  }
+  .no-print{
+    display: none;
+  }
+}

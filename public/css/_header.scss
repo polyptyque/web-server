@@ -1,0 +1,51 @@
+.header{
+  position: relative;
+  padding: 20px;
+  .header-absolute &{
+    position: absolute;
+    z-index: 1;
+  }
+  p,h1{
+    font-size:1rem;
+  }
+  h1{
+    margin:0;
+  }
+  i + span{
+    display:none;
+  }
+  &__title{
+    a{
+      font-size:2em;
+      text-decoration: none;
+      &:hover{
+        color:$red;
+      }
+    }
+  }
+  a,.baseline{
+    @include transition(.5s);
+  }
+  .baseline{
+    position: absolute;
+    right:3.5em;
+    left:0;
+    bottom:0;
+    top:0;
+    height:2em;
+    line-height: 1.66em;
+    margin:auto;
+    pointer-events: none ;
+    opacity: 0;
+    .box{
+      font-size:2em;
+      display: inline-block;
+      width:2em;
+    }
+  }
+  &:hover{
+    .baseline{
+      opacity: 1;
+    }
+  }
+}

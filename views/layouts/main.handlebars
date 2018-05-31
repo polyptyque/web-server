@@ -6,7 +6,7 @@
 
     <meta name="description" content="{{description}}">
 
-    <meta name="viewport" content = "width = device-width, initial-scale = 1.0, minimum-scale = 1, maximum-scale = 1, user-scalable = no" />
+    <meta name="viewport" content = "width = device-width, initial-scale = 1.0, minimum-scale = 1, maximum-scale = 1" />
     <meta name="apple-mobile-web-app-title" content="{{name}}" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -38,18 +38,48 @@
     <meta property="og:description"        content="{{description}}" />
     <meta property="og:image"              content="http://polyptyque.photo/img/polypoto/social-card.png" />
 
-    <script src="/js/jquery-3.2.0.min.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/underscore-min.js"></script>
 {{#each scripts}}
-    <script src="/js/{{this}}"></script>
+    <script src="{{this}}"></script>
 {{/each}}
-    <script src="/js/main.js"></script>
 
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" media="print" href="/css/print.css" />
 
 </head>
-<body class="{{bodyClasses}}">
+<body class="{{#each bodyClasses}}{{this}} {{/each}}">
+<header class="header">
+    <nav>
+        <h1 class="header__title"><a href="/"><i class="icon-logo-polyptyque-bold" title="Polyptyque"></i><span>Polyptyque</span></a></h1>
+        <p class="baseline">par Bertrand Sandrez <span class="box"></span>et Arthur Violy</p>
+    </nav>
+</header>
 {{{body}}}
+<footer class="footer">
+    <nav>
+        <ul>
+            <li>
+                <a href="http://notes.polyptyque.photo/" target="_blank" rel="noopener">notes</a>
+            </li>
+            <li>
+                <a href="https://twitter.com/PolyptyquePhoto" target="_blank" rel="noopener">Twitter</a>
+            </li>
+            <li>
+                <a href="http://f93.fr" target="_blank" rel="noopener">F93</a>
+            </li>
+            <li>
+                <a href="http://www.instantschavires.com/" target="_blank" rel="noopener">Les instants chavirés</a>
+            </li>
+            <li>
+                <a href="http://violy.net" target="_blank" rel="noopener">Arthur Violy</a>
+            </li>
+            <li>
+                <a href="http://bertrandsandrez.com" target="_blank" rel="noopener">Bertrand Sandrez</a>        </ul>
+        </li>
+    </nav>
+</footer>
+<script>
+    window.lazyLoadOptions = {};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-lazyload/8.7.1/lazyload.min.js" async></script>
 </body>
 </html>

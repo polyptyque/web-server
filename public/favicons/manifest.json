@@ -1,5 +1,6 @@
 {
- "name": "App",
+ "name": "Polyptyque",
+ "short_name": "Polyptyque",
  "icons": [
   {
    "src": "\/android-icon-36x36.png",
