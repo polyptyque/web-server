@@ -18,7 +18,10 @@ COPY package.json /usr/src/app/
 RUN npm install
 
 # Copie les sources
-COPY . /usr/src/app
+COPY ./config-default.json /usr/src/app/
+COPY ./public /usr/src/app/public
+COPY ./views /usr/src/app/views
+COPY ./index.js /usr/src/app/
 
 # Expose des ports réseaux
 EXPOSE 80
