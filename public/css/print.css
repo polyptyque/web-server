@@ -1,0 +1,13 @@
+@import url("https://fonts.googleapis.com/css?family=Montserrat:400,100i,300,500,500i,700");
+.home header {
+  display: none; }
+.home .full-size.logo-typo {
+  width: 100%;
+  margin-left: 0; }
+.home .print-small {
+  width: 4cm;
+  height: auto; }
+.home .no-print {
+  display: none; }
+
+/*# sourceMappingURL=print.css.map */

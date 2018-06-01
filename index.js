@@ -1,18 +1,22 @@
 // fs, underscore & util
-var fs = require('fs.extra');
-var util = require('util');
-var _ = require('underscore');
-var spawn = require( 'child_process' ).spawn;
-var nodemailer = require('nodemailer');
+const fs = require('fs.extra');
+const path = require('path');
+//const util = require('util');
+const _ = require('underscore');
+const spawn = require( 'child_process' ).spawn;
+const nodemailer = require('nodemailer');
 
 // express js app
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var multiparty = require('multiparty');
-var sha1 = require('sha1');
-var targz = require('tar.gz');
-var mysql = require('mysql');
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+//const multiparty = require('multiparty');
+const sha1 = require('sha1');
+//const tar = require('tar');
+const mysql = require('mysql');
+const webp = require('webp-middleware');
+const cssEmbeded = fs.readFileSync('./public/css/main.min.css');
+
 //
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -26,8 +30,9 @@ try {
     console.log('ATTENTION : Canvas indisponible');
 }
 // config file test
-var configFile = './config.json',
-    configFileDefault = './config-default.json';
+const configFile = './config.json',
+      configFileDefault = './config-default.json';
+//
 if (!fs.existsSync(configFile)) {
     fs.copy(configFileDefault,configFile,function(){
         process.exit(1);
@@ -41,6 +46,7 @@ var config = require(configFile),
 config.title = config.name;
 config.layout = 'main';
 config.scripts = [];
+config.cssEmbeded = cssEmbeded;
 config.bodyClasses = [];
 
 const PORT=config.PORT;
@@ -49,6 +55,14 @@ const PORT=config.PORT;
 var uploadDir = './uploads/';
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
+}
+var cachedDir = './cache/';
+var cachedWebPDir = './cache/webp';
+if (!fs.existsSync(cachedDir)) {
+    fs.mkdirSync(cachedDir);
+}
+if (!fs.existsSync(cachedWebPDir)) {
+    fs.mkdirSync(cachedWebPDir);
 }
 var thumbsDir = './mixes/thumbs/';
 if (!fs.existsSync(thumbsDir)) {
@@ -586,8 +600,11 @@ app.use('/polypoto', Polypoto);
 
 // static public
 app.use('/uploads',express.static('uploads'));
+//
 // static public
+app.use(webp(__dirname + '/public', {cacheDir:path.join(process.cwd(), 'cache/webp')}));
 app.use(express.static('public'));
+
 
 // 404
 app.use(function(req, res, next) {

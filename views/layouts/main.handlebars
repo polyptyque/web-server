@@ -6,7 +6,7 @@
 
     <meta name="description" content="{{description}}">
 
-    <meta name="viewport" content = "width = device-width, initial-scale = 1.0, minimum-scale = 1, maximum-scale = 1" />
+    <meta name="viewport" content = "width = device-width, initial-scale = 1.0, minimum-scale = 1, maximum-scale = 5" />
     <meta name="apple-mobile-web-app-title" content="{{name}}" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -42,8 +42,7 @@
     <script src="{{this}}"></script>
 {{/each}}
 
-    <link rel="stylesheet" type="text/css" href="/css/main.css" />
-    <link rel="stylesheet" type="text/css" media="print" href="/css/print.css" />
+    <style>{{{cssEmbeded}}}</style>
 
 </head>
 <body class="{{#each bodyClasses}}{{this}} {{/each}}">
@@ -81,5 +80,6 @@
     window.lazyLoadOptions = {};
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-lazyload/8.7.1/lazyload.min.js" async></script>
+<link rel="stylesheet" type="text/css" media="print" href="/css/print.css" />
 </body>
 </html>
