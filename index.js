@@ -591,6 +591,13 @@ app.get('/', Home);
 app.post('/', Home);
 
 
+// About
+function Legals(req, res, next) {
+    console.log('Legals.');
+    res.render('about', _.defaults({bodyClasses:['about','home','centered-layout']},config));
+}
+app.use('/a-propos', Legals);
+
 // Polypoto
 function Polypoto(req, res, next) {
     console.log('Polypoto.');
@@ -608,7 +615,7 @@ app.use(express.static('public'));
 
 // 404
 app.use(function(req, res, next) {
-    res.status(404).render('not-found',_.defaults({title:'404 non trouvé',bodyClasses:['404']},config));
+    res.status(404).render('not-found',_.defaults({title:'404 non trouvé',bodyClasses:['404','centered-layout']},config));
 });
 
 // Server
