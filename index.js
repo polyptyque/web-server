@@ -15,12 +15,28 @@ const sha1 = require('sha1');
 //const tar = require('tar');
 const mysql = require('mysql');
 const webp = require('webp-middleware');
+var minifyHTML = require('express-minify-html');
+
+
 const cssEmbeded = fs.readFileSync('./public/css/main.min.css');
 
 //
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
     extended: true
+}));
+
+app.use(minifyHTML({
+    override:      true,
+    exception_url: false,
+    htmlMinifier: {
+        removeComments:            true,
+        collapseWhitespace:        true,
+        collapseBooleanAttributes: true,
+        removeAttributeQuotes:     true,
+        removeEmptyAttributes:     true,
+        minifyJS:                  true
+    }
 }));
 //
 try {
@@ -47,6 +63,7 @@ config.title = config.name;
 config.layout = 'main';
 config.scripts = [];
 config.cssEmbeded = cssEmbeded;
+config.socialImage = "https://polyptyque.photo/img/doc/social-card.jpg";
 config.bodyClasses = [];
 
 const PORT=config.PORT;
@@ -585,7 +602,12 @@ app.get('/preview-:uid', Preview);
 function Home(req, res, next) {
     console.log('Home.');
     res.render('home', _.defaults({
-        bodyClasses:['home','centered-layout','header-absolute']},config));
+        title: "Polyptyque : Photographies interactives à 180°",
+        description:"Polyptyque : Projet de recherche par Bertrand Sandrez et Arthur Violy. " +
+        "Experience de portraits photographiques à 180°, visibles sur iPhone. " +
+        "design interactif, raspberry Pi camera.",
+        bodyClasses:['home','centered-layout','header-absolute']
+    },config));
 }
 app.get('/', Home);
 app.post('/', Home);
@@ -601,7 +623,13 @@ app.use('/a-propos', Legals);
 // Polypoto
 function Polypoto(req, res, next) {
     console.log('Polypoto.');
-    res.render('polypoto', _.defaults({bodyClasses:['polypoto','centered-layout']},config));
+    res.render('polypoto', _.defaults({
+        title:"Polypoto — vivez l’expérience avec Polyptyque.",
+        description:"Experience de portraits photographiques à 180°, visibles sur smartphone. " +
+        "soutenu par F93 à Montreuil, aux Instants chavirés",
+        socialImage:"https://polyptyque.photo/img/polypoto/social-card.png",
+        bodyClasses:['polypoto','centered-layout'
+    ]},config));
 }
 app.use('/polypoto', Polypoto);
 
