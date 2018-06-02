@@ -23,3 +23,34 @@ p{
   }
   text-align: center;
 }
+
+.site-loader{
+  z-index: 10;
+  background: $red;
+  width:100vw;
+  height:100vh;
+  position: fixed;
+  top:0;
+  left:0;
+  font-size:3rem;
+  line-height: 1em;
+  color:$beige;
+  @include animation(loader-fade 1s 1s 1 both);
+  .icon-logo-polyptyque{
+    position: absolute;
+    width:1em;
+    height:1em;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    margin: auto;
+  }
+}
+
+@keyframes loader-fade {
+  100%{
+    opacity: 0;
+    visibility: hidden;
+  }
+}

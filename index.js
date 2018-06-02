@@ -10,6 +10,7 @@ const nodemailer = require('nodemailer');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const mcache = require('memory-cache');
 //const multiparty = require('multiparty');
 const sha1 = require('sha1');
 //const tar = require('tar');
@@ -56,6 +57,8 @@ if (!fs.existsSync(configFile)) {
     console.log('config.json copied from default. Please restart app');
     return;
 }
+
+const _24H_ = 60 * 60 * 24;
 
 var config = require(configFile),
     baseScripts = ['/js/jquery-3.2.0.min.js','/js/bootstrap.min.js','/js/underscore-min.js'];
@@ -118,6 +121,31 @@ function initializeConnection() {
 }
 //
 //
+
+var cache = function(duration) {
+    return function(req, res, next){
+        //return next();
+        //
+        if(req.method.toLowerCase() === 'get'){
+            var key = '__express__' + req.originalUrl || req.url;
+            console.log(key);
+            var cachedBody = mcache.get(key);
+            if (cachedBody) {
+                res.send(cachedBody)
+                return
+            } else {
+                res.sendResponse = res.send
+                res.send = function(body) {
+                    mcache.put(key, body, duration * 1000);
+                    res.sendResponse(body)
+                }
+                next()
+            }
+        }else{
+            next();
+        }
+    }
+}
 
 // express handlerbars template
 var exphbs  = require('express-handlebars');
@@ -594,8 +622,8 @@ function Preview(req, res, next) {
         bodyClasses:['demo']
     },config));
 }
-app.get('/preview', Preview);
-app.get('/preview-:uid', Preview);
+app.get('/preview',cache(_24H_), Preview);
+app.get('/preview-:uid',cache(_24H_), Preview);
 
 
 // Home
@@ -609,7 +637,7 @@ function Home(req, res, next) {
         bodyClasses:['home','centered-layout','header-absolute']
     },config));
 }
-app.get('/', Home);
+app.get('/', cache(_24H_), Home);
 app.post('/', Home);
 
 
@@ -618,7 +646,7 @@ function Legals(req, res, next) {
     console.log('Legals.');
     res.render('about', _.defaults({bodyClasses:['about','home','centered-layout']},config));
 }
-app.use('/a-propos', Legals);
+app.use('/a-propos',cache(_24H_), Legals);
 
 // Polypoto
 function Polypoto(req, res, next) {
@@ -631,7 +659,7 @@ function Polypoto(req, res, next) {
         bodyClasses:['polypoto','centered-layout'
     ]},config));
 }
-app.use('/polypoto', Polypoto);
+app.use('/polypoto', cache(_24H_), Polypoto);
 
 // static public
 app.use('/uploads',express.static('uploads'));
