@@ -59,6 +59,7 @@ if (!fs.existsSync(configFile)) {
 }
 
 const _24H_ = 60 * 60 * 24;
+const _1MONTH_ = _24H_*30;
 
 var config = require(configFile),
     baseScripts = ['/js/jquery-3.2.0.min.js','/js/bootstrap.min.js','/js/underscore-min.js'];
@@ -622,8 +623,8 @@ function Preview(req, res, next) {
         bodyClasses:['demo']
     },config));
 }
-app.get('/preview',cache(_24H_), Preview);
-app.get('/preview-:uid',cache(_24H_), Preview);
+app.get('/preview',cache(_1MONTH_), Preview);
+app.get('/preview-:uid',cache(_1MONTH_), Preview);
 
 
 // Home
@@ -637,7 +638,7 @@ function Home(req, res, next) {
         bodyClasses:['home','centered-layout','header-absolute']
     },config));
 }
-app.get('/', cache(_24H_), Home);
+app.get('/', cache(_1MONTH_), Home);
 app.post('/', Home);
 
 
@@ -646,7 +647,7 @@ function Legals(req, res, next) {
     console.log('Legals.');
     res.render('about', _.defaults({bodyClasses:['about','home','centered-layout']},config));
 }
-app.use('/a-propos',cache(_24H_), Legals);
+app.use('/a-propos',cache(_1MONTH_), Legals);
 
 // Polypoto
 function Polypoto(req, res, next) {
@@ -659,7 +660,7 @@ function Polypoto(req, res, next) {
         bodyClasses:['polypoto','centered-layout'
     ]},config));
 }
-app.use('/polypoto', cache(_24H_), Polypoto);
+app.use('/polypoto', cache(_1MONTH_), Polypoto);
 
 // static public
 app.use('/uploads',express.static('uploads'));
