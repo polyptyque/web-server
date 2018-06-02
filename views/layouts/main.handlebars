@@ -41,6 +41,7 @@
 {{#each scripts}}
     <script src="{{this}}"></script>
 {{/each}}
+    <style>{{{cssEmbeded}}}</style>
 
 </head>
 <body class="{{#each bodyClasses}}{{this}} {{/each}}">
@@ -80,7 +81,6 @@
 <script>
     window.lazyLoadOptions = {};
 </script>
-<style>{{{cssEmbeded}}}</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-lazyload/8.7.1/lazyload.min.js" async></script>
 <link rel="preload" href="/css/print.css" media="print" as="style" onload="this.rel='stylesheet'">
 
