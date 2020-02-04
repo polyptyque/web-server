@@ -16,7 +16,7 @@ const sha1 = require('sha1');
 //const tar = require('tar');
 const mysql = require('mysql');
 const webp = require('webp-middleware');
-var minifyHTML = require('express-minify-html');
+var minifyHTML = require('express-minify-html-2');
 
 
 const cssEmbeded = fs.readFileSync('./public/css/main.min.css');
