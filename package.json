@@ -35,7 +35,7 @@
     "path": "^0.12.7",
     "sha1": "^1.1.1",
     "tar": "^4.4.13",
-    "underscore": "^1.9.2",
+    "underscore": "^1.12.1",
     "util": "^0.10.4",
     "webp-middleware": "^0.4.0"
   }
