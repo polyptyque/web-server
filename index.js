@@ -148,8 +148,8 @@ var cache = function(duration) {
 }
 
 // express handlerbars template
-var exphbs  = require('express-handlebars');
-var hbs = exphbs.create({
+var { create: exphbs } = require('express-handlebars');
+var hbs = exphbs({
     helpers:{
         ifvalue:function (conditional, options) {
             if (options.hash.value === conditional) {
