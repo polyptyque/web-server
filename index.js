@@ -41,8 +41,7 @@ app.use(minifyHTML({
 }));
 //
 try {
-    var Canvas = require('canvas'),
-        Image = Canvas.Image;
+    var { createCanvas, Image } = require('canvas');
 }catch(err){
     console.log('ATTENTION : Canvas indisponible');
 }
@@ -314,7 +313,7 @@ app.post('/upload',postImage);
 // ThumbsPreview
 function ThumbsPreview(req,res,next){
     var uid = req.params.uid,
-        canvas = new Canvas(),
+        canvas = createCanvas(1, 1),
         imgReady = 0,
         thumbsScale = 0.1,
         thumbsTotal = 19,
@@ -352,11 +351,11 @@ function ThumbsPreview(req,res,next){
 
     function Finish(){
         res.type("jpg");
-        var stream = canvas.jpegStream({bufsize: 4096, quality: 75, progressive:false});
+        var stream = canvas.createJPEGStream({quality: 0.75});
         stream.pipe(res);
 
         var fileCachePath = './mixes/thumbs/preview-'+uid+'.jpg',
-            streamFile = canvas.jpegStream({bufsize: 4096, quality: 75, progressive:false}),
+            streamFile = canvas.createJPEGStream({quality: 0.75}),
             cache = fs.createWriteStream(fileCachePath);
 
         streamFile.on('data', function(chunk){
