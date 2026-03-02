@@ -557,7 +557,7 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                             ;
                             res.render('demo', _.defaults({
                                 imgBaseUrl:imgBaseUrl,
-                                scripts:_.union(baseScripts,'/js/demo.js'),
+                                scripts:_.union(baseScripts,['/js/demo.js']),
                                 bodyClasses:['demo'],
                                 shortUrl:shortenUid},config)
                             );
@@ -584,7 +584,7 @@ function ListAllShots(req,res,next){
         if(err) return res.status(500).send("MySQLError:",err.toString());
         res.render('list-all', _.defaults({
             results:results,
-            scripts:_.union(baseScripts,'/js/list-all.js'),
+            scripts:_.union(baseScripts,['/js/list-all.js']),
             bodyClasses:['list-all']
         },config))
         connection.end();
@@ -603,7 +603,7 @@ function Demo(req, res, next) {
     }
     res.render('demo', _.defaults({
         imgBaseUrl:imgBaseUrl,
-        scripts:_.union(baseScripts,'/js/demo.js'),
+        scripts:_.union(baseScripts,['/js/demo.js']),
         bodyClasses:['demo'],
         shortUrl:false
     },config));
@@ -618,7 +618,7 @@ function Preview(req, res, next) {
         uid = req.params.uid;
     res.render('preview', _.defaults({
         uid:uid,
-        scripts:_.union(baseScripts,'/js/preview.js'),
+        scripts:_.union(baseScripts,['/js/preview.js']),
         bodyClasses:['demo']
     },config));
 }

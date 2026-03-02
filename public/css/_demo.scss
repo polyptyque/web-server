@@ -4,6 +4,9 @@ html, body{
 }
 body.demo{
   overflow: hidden;
+  .footer, .header .baseline{
+    display:none;
+  }
 }
 body.demo > div.demo-wrapper{
   background-color:#333;
