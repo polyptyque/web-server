@@ -14,7 +14,7 @@ const mcache = require('memory-cache');
 //const multiparty = require('multiparty');
 const sha1 = require('sha1');
 //const tar = require('tar');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const webp = require('webp-middleware');
 var minifyHTML = require('express-minify-html-2');
 
