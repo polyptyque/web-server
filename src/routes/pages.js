@@ -77,8 +77,7 @@ function Preview(req, res) {
         }
     );
 }
-router.get('/preview', cacheMiddleware(_15MIN_), Preview);
-router.get('/preview-:uid', cacheMiddleware(_15MIN_), Preview);
+router.get('/preview-:uid', cacheMiddleware(_1MONTH_), Preview);
 
 // ── Home ───────────────────────────────────────────────────────────────────────
 function Home(req, res) {
