@@ -21,6 +21,7 @@ RUN npm install
 COPY ./config-default.json /usr/src/app/
 COPY ./public /usr/src/app/public
 COPY ./views /usr/src/app/views
+COPY ./src /usr/src/app/src
 COPY ./index.js /usr/src/app/
 
 # Expose des ports réseaux
