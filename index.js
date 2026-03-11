@@ -5,6 +5,7 @@ const path = require('path');
 const _ = require('underscore');
 const spawn = require( 'child_process' ).spawn;
 const nodemailer = require('nodemailer');
+const { PassThrough } = require('stream');
 
 // express js app
 const express = require('express');
@@ -16,7 +17,7 @@ const sha1 = require('sha1');
 //const tar = require('tar');
 const mysql = require('mysql2');
 const webp = require('webp-middleware');
-var minifyHTML = require('express-minify-html-2');
+const minifyHTML = require('express-minify-html-2');
 
 
 const cssEmbeded = fs.readFileSync('./public/css/main.min.css');
@@ -71,6 +72,44 @@ config.bodyClasses = [];
 
 const PORT=config.PORT;
 
+const CACHE_MAX_ENTRIES = parseInt(process.env.CACHE_MAX_ENTRIES || '200', 10);
+const CACHE_MAX_BODY_BYTES = parseInt(process.env.CACHE_MAX_BODY_BYTES || '262144', 10);
+const IMAGE_TASK_LIMIT = parseInt(process.env.IMAGE_TASK_LIMIT || '2', 10);
+const cacheKeys = [];
+let runningImageTasks = 0;
+const pendingImageTasks = [];
+
+function safeBodySize(body) {
+    if (typeof body === 'string') return Buffer.byteLength(body, 'utf8');
+    if (Buffer.isBuffer(body)) return body.length;
+    return 0;
+}
+
+function enqueueCacheKey(key) {
+    cacheKeys.push(key);
+    if (cacheKeys.length > CACHE_MAX_ENTRIES) {
+        var oldest = cacheKeys.shift();
+        if (oldest) mcache.del(oldest);
+    }
+}
+
+function acquireImageSlot(runTask) {
+    if (runningImageTasks < IMAGE_TASK_LIMIT) {
+        runningImageTasks++;
+        return runTask(releaseImageSlot);
+    }
+    pendingImageTasks.push(runTask);
+}
+
+function releaseImageSlot() {
+    runningImageTasks = Math.max(0, runningImageTasks - 1);
+    var nextTask = pendingImageTasks.shift();
+    if (nextTask) {
+        runningImageTasks++;
+        nextTask(releaseImageSlot);
+    }
+}
+
 // Upload dir test
 var uploadDir = './uploads/';
 if (!fs.existsSync(uploadDir)) {
@@ -122,21 +161,30 @@ function initializeConnection() {
 //
 //
 
-var cache = function(duration) {
+const cache = function(duration) {
     return function(req, res, next){
         //return next();
         //
         if(req.method.toLowerCase() === 'get'){
-            var key = '__express__' + req.originalUrl || req.url;
-            console.log(key);
-            var cachedBody = mcache.get(key);
+            if (/^\/preview-[^/]+$/.test(req.path)) return next();
+            const key = '__express__' + (req.originalUrl || req.url);
+            const cachedBody = mcache.get(key);
             if (cachedBody) {
-                res.send(cachedBody)
-                return
+                res.send(cachedBody);
             } else {
                 res.sendResponse = res.send
                 res.send = function(body) {
-                    mcache.put(key, body, duration * 1000);
+                    const contentType = (res.get('Content-Type') || '').toLowerCase();
+                    const bodySize = safeBodySize(body);
+                    if (
+                        res.statusCode === 200 &&
+                        contentType.indexOf('text/html') !== -1 &&
+                        bodySize > 0 &&
+                        bodySize <= CACHE_MAX_BODY_BYTES
+                    ) {
+                        mcache.put(key, body, duration * 1000);
+                        enqueueCacheKey(key);
+                    }
                     res.sendResponse(body)
                 }
                 next()
@@ -147,9 +195,9 @@ var cache = function(duration) {
     }
 }
 
-// express handlerbars template
-var { create: exphbs } = require('express-handlebars');
-var hbs = exphbs({
+// express handlebars template
+const { create: exphbs } = require('express-handlebars');
+const hbs = exphbs({
     helpers:{
         ifvalue:function (conditional, options) {
             if (options.hash.value === conditional) {
@@ -172,9 +220,8 @@ var hbs = exphbs({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 app.enable('view cache');
-var scripts = [];
 
-var response_fields_mapping = {
+const response_fields_mapping = {
     res1:'temper',
     res2:'quality',
     res3:'hobby',
@@ -197,17 +244,14 @@ function postImage(req, res) {
             // form
             // signature sha1(private_key+uid)
             // archive file tar gz
+            const { uid, signature, form_responses } = { ... req.body};
+            const { firstname, lastname, email } = { ... form_responses };
+            const dirPath = uploadDir+uid,
+                archivePath = dirPath+'.tar.gz';
             try {
-                var uid = req.body.uid,
-                    signature = req.body.signature,
-                    form_responses = req.body.form_responses,
-                    dirPath = uploadDir+uid,
-                    archivePath = dirPath+'.tar.gz',
-                    firstname = form_responses.firstname,
-                    lastname = form_responses.lastname,
-                    email = form_responses.email,
-                    responses = _(response_fields_mapping).mapObject(function(val,key){
-                        var response = form_responses[val];
+                if(!uid || !signature || !form_responses || !firstname || !lastname) throw new Error("missing fields");
+                var responses = _(response_fields_mapping).mapObject(function(val,key){
+                        const response = form_responses[val];
                         if(response) return response;
                         return "none";
                     });
@@ -215,9 +259,9 @@ function postImage(req, res) {
                 return res.status(500).send("erreur dans les champs du formulaire: \n"+err.toString()+"\n\n"+JSON.stringify(req.body));
             }
 
-            var shortenId = /^[0-9]{6}-[0-9]{6}-([abcdef0-9]{6})$/.exec(uid)[1];
+            const shortenId = /^[0-9]{6}-[0-9]{6}-([abcdef0-9]{6})$/.exec(uid)[1];
 
-            if (signature != sha1(config.private_key+uid))
+            if (signature !== sha1(config.private_key+uid))
                 return res.status(500).send("signature invalide");
 
             if (!fs.existsSync(dirPath)){
@@ -225,7 +269,7 @@ function postImage(req, res) {
             }
 
             console.log("start extract",archivePath,uploadDir);
-            var extractTarGz = spawn( 'tar', [ '-xzvf', archivePath, '-C', uploadDir ])
+            const extractTarGz = spawn( 'tar', [ '-xzvf', archivePath, '-C', uploadDir ])
 
             extractTarGz.stdout.on( 'data', function(data) {
                  console.log( 'stdout: ',data.toString());
@@ -241,10 +285,10 @@ function postImage(req, res) {
                 // INSERT INTO `shot` (`shot_id`, `uid`, `date`, `user_firstname`, `user_lastname`, `user_email`, `res1`, `res2`, `res3`, `res4`, `res5`, `res6`, `res7`, `res8`) VALUES (NULL, 'test_uid', CURRENT_TIMESTAMP, 'arthur', 'violy', 'arthur@violy.net', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
                 //
                 console.log("extract complete", code);
-                if(code != 0) return res.status(500).send("extract failure");
-                var connection = initializeConnection();
+                if(parseInt(code) !== 0) return res.status(500).send("extract failure");
+                const connection = initializeConnection();
 
-                var query = "INSERT INTO `shot` " +
+                const query = "INSERT INTO `shot` " +
                     "(`shot_id`, `uid`, `date`, " +
                     "`user_firstname`, `user_lastname`, `user_email`, `enabled`, " +
                     "`res1`, `res2`, `res3`, `res4`, `res5`, `res6`, `res7`, `res8`) " +
@@ -260,6 +304,7 @@ function postImage(req, res) {
                     "'"+responses.res8+"')";
 
                 function MysqlError(err){
+                    connection.end();
                     res.status(500).send("Mysql error: "+err.toString());
                 }
                 //
@@ -268,15 +313,15 @@ function postImage(req, res) {
                 connection.query(query, function (err, results, fields) {
                     if (err) return MysqlError(err);
                     // selection des prises de vues existantes (non nouvelle)
-                    var insertId = results.insertId;
-                    query = "SELECT * FROM `shot` WHERE `shot_id` != "+insertId+" AND `enabled` = 1";
+                    const { insertId } = results;
+                    const query = "SELECT * FROM `shot` WHERE `shot_id` != "+insertId+" AND `enabled` = 1";
                     connection.query(query, function(err, results, fields) {
                         if (err) return MysqlError(err);
                         //
                         // ajout des relations
                         //
-                        var query = "INSERT INTO `relation` (`id`, `shot0`, `shot1`, `value`) VALUES ";
-                        var values = [];
+                        let query = "INSERT INTO `relation` (`id`, `shot0`, `shot1`, `value`) VALUES ";
+                        const values = [];
                         _(results).each(function(shot){
                             var score = 0;
                             for(var r=1; r<=8; r++){
@@ -292,7 +337,7 @@ function postImage(req, res) {
                             if(email){
                                 var subject = "POLYPOTO : "+firstname+" retrouvez votre portrait !";
                                 var message = "Merci "+firstname+". Votre portrait est disponible à cette adresse : \n"+
-                                    "http://polyptyque.photo/"+shortenId+ ">";
+                                    "https://polyptyque.photo/"+shortenId+ ">";
                                 sendMail(email,subject,message,message);
                             }
                         });
@@ -312,62 +357,89 @@ app.post('/upload',postImage);
 
 // ThumbsPreview
 function ThumbsPreview(req,res,next){
-    var uid = req.params.uid,
-        canvas = createCanvas(1, 1),
-        imgReady = 0,
-        thumbsScale = 0.1,
-        thumbsTotal = 19,
-        thumbWidth, thumbHeight,
-        canvasWidth, canvasHeight,
-        ctx = canvas.getContext('2d');
-
-    function AddImage(){
-        var imgSrc = uploadDir+uid+'/'+imgReady+'.jpg';
-        console.log('AddImage',imgSrc)
-        fs.readFile(imgSrc, function(err, squid){
-            if (err) return next();
-            var img = new Image;
-            img.src = squid;
-
-            if(imgReady == 0){
-                thumbWidth = Math.round(img.width*thumbsScale),
-                thumbHeight = Math.round(img.height*thumbsScale),
-                canvasWidth = thumbWidth*thumbsTotal,
-                canvasHeight = thumbHeight;
-                canvas.width = canvasWidth;
-                canvas.height = canvasHeight;
-                console.log('canvas size',thumbWidth,thumbHeight,canvasWidth,canvasHeight);
+    if (!createCanvas || !Image) return next();
+    acquireImageSlot(function(releaseSlot) {
+        var released = false;
+        function cleanup() {
+            if (released) return;
+            released = true;
+            if (canvas) {
+                canvas.width = 0;
+                canvas.height = 0;
             }
+            releaseSlot();
+        }
 
-            ctx.drawImage(img, imgReady*thumbWidth, 0, thumbWidth, thumbHeight);
-            imgReady ++;
-            if(imgReady == 19){
-                Finish();
-            }else{
-                AddImage();
-            }
-        });
-    }
+        res.once('close', cleanup);
+        res.once('finish', cleanup);
+        res.once('error', cleanup);
 
-    function Finish(){
-        res.type("jpg");
-        var stream = canvas.createJPEGStream({quality: 0.75});
-        stream.pipe(res);
+        const uid = req.params.uid,
+            canvas = createCanvas(1, 1),
+            thumbsScale = 0.1,
+            thumbsTotal = 19,
+            ctx = canvas.getContext('2d');
+        let imgReady = 0,
+            thumbWidth, thumbHeight,
+            canvasWidth, canvasHeight;
 
-        var fileCachePath = './mixes/thumbs/preview-'+uid+'.jpg',
-            streamFile = canvas.createJPEGStream({quality: 0.75}),
-            cache = fs.createWriteStream(fileCachePath);
+        function AddImage(){
+            const imgSrc = uploadDir+uid+'/'+imgReady+'.jpg';
+            console.log('AddImage',imgSrc)
+            fs.readFile(imgSrc, function(err, squid){
+                if (err) {
+                    cleanup();
+                    return next();
+                }
+                const img = new Image;
+                img.src = squid;
 
-        streamFile.on('data', function(chunk){
-            cache.write(chunk);
-        });
+                if(imgReady === 0){
+                    thumbWidth = Math.round(img.width*thumbsScale);
+                    thumbHeight = Math.round(img.height*thumbsScale);
+                    canvasWidth = thumbWidth*thumbsTotal;
+                    canvasHeight = thumbHeight;
+                    canvas.width = canvasWidth;
+                    canvas.height = canvasHeight;
+                    console.log('canvas size',thumbWidth,thumbHeight,canvasWidth,canvasHeight);
+                }
 
-        streamFile.on('end', function(){
-            console.log('saved '+fileCachePath);
-        });
-    }
+                ctx.drawImage(img, imgReady*thumbWidth, 0, thumbWidth, thumbHeight);
+                imgReady ++;
+                if(imgReady === 19){
+                    Finish();
+                }else{
+                    AddImage();
+                }
+            });
+        }
 
-    AddImage();
+        function Finish(){
+            res.type("jpg");
+
+            const fileCachePath = './mixes/thumbs/preview-'+uid+'.jpg',
+                cache = fs.createWriteStream(fileCachePath),
+                stream = canvas.createJPEGStream({quality: 0.75}),
+                tee = new PassThrough();
+
+            stream.on('error', function(){
+                cleanup();
+            });
+            cache.on('error', function(){
+                cleanup();
+            });
+
+            stream.pipe(tee);
+            tee.pipe(res);
+            tee.pipe(cache);
+
+            cache.on('finish', function(){
+                console.log('saved '+fileCachePath);
+            });
+        }
+
+        AddImage();
+    });
 
 }
 
@@ -415,81 +487,112 @@ app.use('/mailing',function(req,res,next){
 
 // Mix
 function MixImages(req, res, next){
-    var A = req.params.A,
-        B = req.params.B,
-        n = req.params.n,
-        i = parseInt(n),
-        side = i<9,
-        g = Math.abs(i-9),
-        opacity = Math.round(100-g*11.1111);
-        //iOffset = side == 'r' ? -9 : 10,
-        //i = Math.abs(g+iOffset);
-    console.log(i,side,opacity);
-
-    var imgReady = 0,
-        imgSrcBase = './uploads/',
-        imgSrcSuffix = '/'+n+'.jpg',
-        canvasA = new Canvas(), ctxA = canvasA.getContext('2d'), imgA = new Image(), imgSrcA = imgSrcBase + A + imgSrcSuffix,
-        canvasB = new Canvas(), ctxB = canvasB.getContext('2d'), imgB = new Image(), imgSrcB = imgSrcBase + B + imgSrcSuffix;
-
-    function LoadImage(img,imgSrc,canvas,ctx){
-        fs.readFile(imgSrc, function(err, squid){
-            if (err) {return next();}
-            img = new Image;
-            img.src = squid;
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0, img.width, img.height);
-            imgReady ++;
-            if(imgReady ==2){
-                Blend();
+    if (!createCanvas || !Image) return next();
+    acquireImageSlot(function(releaseSlot) {
+        var released = false;
+        function cleanup() {
+            if (released) return;
+            released = true;
+            if (canvasA) {
+                canvasA.width = 0;
+                canvasA.height = 0;
             }
-        });
-    }
-
-    function Blend(){
-        var fromCanvas,toCtx,toCanvas;
-        if(side){
-            fromCanvas = canvasA;
-            toCtx = ctxB;
-            toCanvas = canvasB;
-        }else{
-            fromCanvas = canvasB;
-            toCtx = ctxA;
-            toCanvas = canvasA;
-        }
-        toCtx.globalAlpha = opacity/100;
-        toCtx.globalCompositeOperation = 'darker';
-        toCtx.drawImage(fromCanvas,0,0);
-        res.type("jpg");
-        var stream = toCanvas.jpegStream({bufsize: 4096, quality: 75, progressive:false});
-        stream.pipe(res);
-
-        var fileCachePathA = 'mixes/'+A,
-            fileCachePathB = fileCachePathA+'/'+B;
-
-        if (!fs.existsSync(fileCachePathA)) {
-            fs.mkdirSync(fileCachePathA);
-        }
-        if (!fs.existsSync(fileCachePathB)) {
-            fs.mkdirSync(fileCachePathB);
+            if (canvasB) {
+                canvasB.width = 0;
+                canvasB.height = 0;
+            }
+            releaseSlot();
         }
 
-        var fileCachePath = fileCachePathB+'/'+n+'.jpg',
-            streamFile = toCanvas.jpegStream({bufsize: 4096, quality: 75, progressive:false}),
-            cache = fs.createWriteStream(fileCachePath);
+        res.once('close', cleanup);
+        res.once('finish', cleanup);
+        res.once('error', cleanup);
 
-        streamFile.on('data', function(chunk){
-            cache.write(chunk);
-        });
+        var A = req.params.A,
+            B = req.params.B,
+            n = req.params.n,
+            i = parseInt(n),
+            side = i<9,
+            g = Math.abs(i-9),
+            opacity = Math.round(100-g*11.1111);
+            //iOffset = side == 'r' ? -9 : 10,
+            //i = Math.abs(g+iOffset);
+        console.log(i,side,opacity);
 
-        streamFile.on('end', function(){
-            console.log('saved '+fileCachePath);
-        });
-    }
+        var imgReady = 0,
+            imgSrcBase = './uploads/',
+            imgSrcSuffix = '/'+n+'.jpg',
+            canvasA = createCanvas(1, 1), ctxA = canvasA.getContext('2d'), imgSrcA = imgSrcBase + A + imgSrcSuffix,
+            canvasB = createCanvas(1, 1), ctxB = canvasB.getContext('2d'), imgSrcB = imgSrcBase + B + imgSrcSuffix;
 
-    LoadImage(imgA,imgSrcA,canvasA,ctxA);
-    LoadImage(imgB,imgSrcB,canvasB,ctxB);
+        function LoadImage(imgSrc,canvas,ctx){
+            fs.readFile(imgSrc, function(err, squid){
+                if (err) {
+                    cleanup();
+                    return next();
+                }
+                var img = new Image;
+                img.src = squid;
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                imgReady ++;
+                if(imgReady ==2){
+                    Blend();
+                }
+            });
+        }
+
+        function Blend(){
+            var fromCanvas,toCtx,toCanvas;
+            if(side){
+                fromCanvas = canvasA;
+                toCtx = ctxB;
+                toCanvas = canvasB;
+            }else{
+                fromCanvas = canvasB;
+                toCtx = ctxA;
+                toCanvas = canvasA;
+            }
+            toCtx.globalAlpha = opacity/100;
+            toCtx.globalCompositeOperation = 'darker';
+            toCtx.drawImage(fromCanvas,0,0);
+            res.type("jpg");
+
+            var fileCachePathA = 'mixes/'+A,
+                fileCachePathB = fileCachePathA+'/'+B;
+
+            if (!fs.existsSync(fileCachePathA)) {
+                fs.mkdirSync(fileCachePathA);
+            }
+            if (!fs.existsSync(fileCachePathB)) {
+                fs.mkdirSync(fileCachePathB);
+            }
+
+            var fileCachePath = fileCachePathB+'/'+n+'.jpg',
+                cache = fs.createWriteStream(fileCachePath),
+                stream = toCanvas.createJPEGStream({quality: 0.75}),
+                tee = new PassThrough();
+
+            stream.on('error', function(){
+                cleanup();
+            });
+            cache.on('error', function(){
+                cleanup();
+            });
+
+            stream.pipe(tee);
+            tee.pipe(res);
+            tee.pipe(cache);
+
+            cache.on('finish', function(){
+                console.log('saved '+fileCachePath);
+            });
+        }
+
+        LoadImage(imgSrcA,canvasA,ctxA);
+        LoadImage(imgSrcB,canvasB,ctxB);
+    });
 
     //res.status(500).end('In progress');
 }
@@ -513,6 +616,7 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
     var connection = initializeConnection();
     connection.query(sql,function(err, results, fields){
         if(err){
+            connection.end();
             console.log(err);
             return res.status(500).send(err);
         }
@@ -524,6 +628,7 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
             console.log(query);
             connection.query(query, function(err, results, fields){
                 if(err){
+                    connection.end();
                     console.log(err);
                     return res.status(500).send(err);
                 }
@@ -532,6 +637,7 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                 console.log(query);
                 connection.query(query, function(err, results, fields){
                     if(err){
+                        connection.end();
                         console.log(err);
                         return res.status(500).send(err);
                     }
@@ -541,6 +647,7 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                     console.log(query);
                     connection.query(query, function(err,results,fields){
                         if(err){
+                            connection.end();
                             console.log(err);
                             return res.status(500).send(err);
                         }
@@ -581,7 +688,10 @@ app.use('/mixes/thumbs/preview-:uid.jpg',ThumbsPreview);
 function ListAllShots(req,res,next){
     var connection = initializeConnection();
     connection.query("SELECT * FROM `shot` WHERE `enabled` = 1", function(err, results){
-        if(err) return res.status(500).send("MySQLError:",err.toString());
+        if(err) {
+            connection.end();
+            return res.status(500).send("MySQLError:"+err.toString());
+        }
         res.render('list-all', _.defaults({
             results:results,
             scripts:_.union(baseScripts,['/js/list-all.js']),
@@ -678,3 +788,4 @@ app.use(function(req, res, next) {
 app.listen(PORT, function(){
     console.log("Server listening on: http://localhost:%s", PORT);
 });
+
