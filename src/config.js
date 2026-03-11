@@ -25,6 +25,7 @@ config.bodyClasses = [];
 config.smtps = config.smtps || null;
 
 const PORT = config.PORT;
+const _15MIN_ = 60 * 15;
 const _24H_ = 60 * 60 * 24;
 const _1MONTH_ = _24H_ * 30;
 
@@ -34,5 +35,5 @@ const baseScripts = [
     '/js/underscore-min.js'
 ];
 
-module.exports = { config, PORT, _24H_, _1MONTH_, baseScripts };
+module.exports = { config, PORT, _24H_, _15MIN_, _1MONTH_, baseScripts };
 

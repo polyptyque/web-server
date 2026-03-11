@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(minifyHTML({
     override: true,
-    exception_url: false,
+    exceptionUrls: [],
     htmlMinifier: {
         removeComments: true,
         collapseWhitespace: true,

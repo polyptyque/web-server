@@ -1,7 +1,7 @@
 const express = require('express');
 const { initializeConnection } = require('../db');
 const { cacheMiddleware } = require('../cache');
-const { config, _1MONTH_, baseScripts } = require('../config');
+const { config, _1MONTH_, _15MIN_, baseScripts } = require('../config');
 
 const router = express.Router();
 
@@ -77,8 +77,8 @@ function Preview(req, res) {
         }
     );
 }
-router.get('/preview', cacheMiddleware(_1MONTH_), Preview);
-router.get('/preview-:uid', cacheMiddleware(_1MONTH_), Preview);
+router.get('/preview', cacheMiddleware(_15MIN_), Preview);
+router.get('/preview-:uid', cacheMiddleware(_15MIN_), Preview);
 
 // ── Home ───────────────────────────────────────────────────────────────────────
 function Home(req, res) {
