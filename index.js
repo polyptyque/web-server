@@ -4,7 +4,6 @@
  */
 const fs = require('fs.extra');
 const express = require('express');
-const bodyParser = require('body-parser');
 const minifyHTML = require('express-minify-html-2');
 
 // Initialisation des répertoires nécessaires au démarrage
@@ -18,8 +17,9 @@ const { setupHandlebars } = require('./src/middleware/handlebars');
 const app = express();
 
 // ── Middlewares globaux ────────────────────────────────────────────────────────
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Express 5 embarque body-parser nativement
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(minifyHTML({
     override: true,
     exception_url: false,

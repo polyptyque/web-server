@@ -144,8 +144,10 @@ router.use(
 );
 
 // ── Shorten UID ────────────────────────────────────────────────────────────────
-router.use(/\/([abcdef0-9]{6}|latest)$/, function (req, res, next) {
-    const shortenUid = req.params['0'];
+// path-to-regexp v8 (Express 5) ne supporte plus les regex inline.
+// On extrait le handler dans une fonction et on monte deux routes explicites.
+function shortenUidHandler(req, res, next) {
+    const shortenUid = req.params.shortenUid;
     const useJsonResponse = req.headers['content-type'] === 'application/json';
 
     let sql = "SELECT * FROM `shot` ";
@@ -228,6 +230,18 @@ router.use(/\/([abcdef0-9]{6}|latest)$/, function (req, res, next) {
             });
         });
     });
+}
+
+// Route /latest
+router.use('/latest', function (req, res, next) {
+    req.params.shortenUid = 'latest';
+    return shortenUidHandler(req, res, next);
+});
+
+// Route /:shortenUid — on filtre manuellement les UIDs valides (6 chars hex)
+router.use('/:shortenUid', function (req, res, next) {
+    if (!/^[abcdef0-9]{6}$/.test(req.params.shortenUid)) return next();
+    return shortenUidHandler(req, res, next);
 });
 
 module.exports = router;
