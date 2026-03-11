@@ -1,5 +1,4 @@
 const express = require('express');
-const _ = require('underscore');
 const { initializeConnection } = require('../db');
 const { cacheMiddleware } = require('../cache');
 const { config, _1MONTH_, baseScripts } = require('../config');
@@ -10,16 +9,14 @@ const router = express.Router();
 router.use('/mailing', function (req, res) {
     res.render(
         'mails/confirmation-html.handlebars',
-        _.defaults(
-            {
+        {
+                ...config,
                 layout: 'mail',
                 brandBeige: '#fff0c3',
                 brandRed: '#e53428',
                 brandGrey: '#646464',
                 subject: 'test subject'
-            },
-            config
-        )
+            }
     );
 });
 
@@ -33,14 +30,12 @@ router.get('/list-all', function ListAllShots(req, res, next) {
         }
         res.render(
             'list-all',
-            _.defaults(
-                {
+            {
+                    ...config,
                     results,
-                    scripts: _.union(baseScripts, ['/js/list-all.js']),
+                    scripts: [...new Set([...baseScripts, '/js/list-all.js'])],
                     bodyClasses: ['list-all']
-                },
-                config
-            )
+                }
         );
         connection.end();
     });
@@ -56,15 +51,13 @@ function Demo(req, res) {
 
     res.render(
         'demo',
-        _.defaults(
-            {
-                imgBaseUrl,
-                scripts: _.union(baseScripts, ['/js/demo.js']),
-                bodyClasses: ['demo'],
-                shortUrl: false
-            },
-            config
-        )
+        {
+            ...config,
+            imgBaseUrl,
+            scripts: [...new Set([...baseScripts, '/js/demo.js'])],
+            bodyClasses: ['demo'],
+            shortUrl: false
+        }
     );
 }
 router.get('/demo', Demo);
@@ -76,14 +69,12 @@ function Preview(req, res) {
     const uid = req.params.uid;
     res.render(
         'preview',
-        _.defaults(
-            {
-                uid,
-                scripts: _.union(baseScripts, ['/js/preview.js']),
-                bodyClasses: ['demo']
-            },
-            config
-        )
+        {
+            ...config,
+            uid,
+            scripts: [...new Set([...baseScripts, '/js/preview.js'])],
+            bodyClasses: ['demo']
+        }
     );
 }
 router.get('/preview', cacheMiddleware(_1MONTH_), Preview);
@@ -94,17 +85,15 @@ function Home(req, res) {
     console.log('Home.');
     res.render(
         'home',
-        _.defaults(
-            {
-                title: 'Polyptyque : Photographies interactives à 180°',
-                description:
-                    "Polyptyque : Projet de recherche par Bertrand Sandrez et Arthur Violy. " +
-                    "Experience de portraits photographiques à 180°, visibles sur iPhone. " +
-                    "design interactif, raspberry Pi camera.",
-                bodyClasses: ['home', 'centered-layout', 'header-absolute']
-            },
-            config
-        )
+        {
+            ...config,
+            title: 'Polyptyque : Photographies interactives à 180°',
+            description:
+                "Polyptyque : Projet de recherche par Bertrand Sandrez et Arthur Violy. " +
+                "Experience de portraits photographiques à 180°, visibles sur iPhone. " +
+                "design interactif, raspberry Pi camera.",
+            bodyClasses: ['home', 'centered-layout', 'header-absolute']
+        }
     );
 }
 router.get('/', cacheMiddleware(_1MONTH_), Home);
@@ -116,7 +105,7 @@ router.use(
     cacheMiddleware(_1MONTH_),
     function Legals(req, res) {
         console.log('Legals.');
-        res.render('about', _.defaults({ bodyClasses: ['about', 'home', 'centered-layout'] }, config));
+        res.render('about', { ...config, bodyClasses: ['about', 'home', 'centered-layout'] });
     }
 );
 
@@ -128,17 +117,15 @@ router.use(
         console.log('Polypoto.');
         res.render(
             'polypoto',
-            _.defaults(
-                {
+            {
+                    ...config,
                     title: "Polypoto — vivez l'expérience avec Polyptyque.",
                     description:
                         "Experience de portraits photographiques à 180°, visibles sur smartphone. " +
                         "soutenu par F93 à Montreuil, aux Instants chavirés",
                     socialImage: 'https://polyptyque.photo/img/polypoto/social-card.png',
                     bodyClasses: ['polypoto', 'centered-layout']
-                },
-                config
-            )
+                }
         );
     }
 );
@@ -215,15 +202,13 @@ function shortenUidHandler(req, res, next) {
                     } else {
                         res.render(
                             'demo',
-                            _.defaults(
-                                {
-                                    imgBaseUrl,
-                                    scripts: _.union(baseScripts, ['/js/demo.js']),
-                                    bodyClasses: ['demo'],
-                                    shortUrl: shortenUid
-                                },
-                                config
-                            )
+                            {
+                                ...config,
+                                imgBaseUrl,
+                                scripts: [...new Set([...baseScripts, '/js/demo.js'])],
+                                bodyClasses: ['demo'],
+                                shortUrl: shortenUid
+                            }
                         );
                     }
                 });

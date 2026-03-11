@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const webp = require('webp-middleware');
-const _ = require('underscore');
 const { config } = require('../config');
 
 const router = express.Router();
@@ -17,9 +16,8 @@ router.use(express.static('public'));
 router.use(function (req, res) {
     res.status(404).render(
         'not-found',
-        _.defaults({ title: '404 non trouvé', bodyClasses: ['404', 'centered-layout'] }, config)
+        { ...config, title: '404 non trouvé', bodyClasses: ['404', 'centered-layout'] }
     );
 });
 
 module.exports = router;
-

@@ -2,7 +2,6 @@ const express = require('express');
 const fs = require('fs.extra');
 const sha1 = require('sha1');
 const spawn = require('child_process').spawn;
-const _ = require('underscore');
 const { initializeConnection } = require('../db');
 const { sendMail } = require('../mail');
 const { config } = require('../config');
@@ -34,10 +33,11 @@ router.post('/', function postImage(req, res) {
         try {
             if (!uid || !signature || !form_responses || !firstname || !lastname)
                 throw new Error('missing fields');
-            var responses = _(response_fields_mapping).mapObject(function (val) {
-                const response = form_responses[val];
-                return response || 'none';
-            });
+            var responses = Object.fromEntries(
+                Object.entries(response_fields_mapping).map(function ([key, val]) {
+                    return [key, form_responses[val] || 'none'];
+                })
+            );
         } catch (err) {
             return res.status(500).send(
                 'erreur dans les champs du formulaire: \n' + err.toString() + '\n\n' + JSON.stringify(req.body)
@@ -99,7 +99,7 @@ router.post('/', function postImage(req, res) {
 
                     let q3 = "INSERT INTO `relation` (`id`, `shot0`, `shot1`, `value`) VALUES ";
                     const values = [];
-                    _(results).each(function (shot) {
+                    results.forEach(function (shot) {
                         let score = 0;
                         for (let r = 1; r <= 8; r++) {
                             score += shot['res' + r] == responses['res' + r] ? 1 : 0;
