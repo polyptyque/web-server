@@ -4,6 +4,7 @@ const { config } = require('./config');
 
 function sendMail(to, subject, text, html, callback) {
     if (!nodemailer) nodemailer = require('nodemailer');
+    if(!config.smtps) throw new Error('SMTP configuration missing');
 
     const transporter = nodemailer.createTransport(config.smtps);
 

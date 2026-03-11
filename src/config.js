@@ -22,6 +22,7 @@ config.scripts = [];
 config.cssEmbeded = cssEmbeded;
 config.socialImage = 'https://polyptyque.photo/img/doc/social-card.jpg';
 config.bodyClasses = [];
+config.smtps = config.smtps || null;
 
 const PORT = config.PORT;
 const _24H_ = 60 * 60 * 24;
