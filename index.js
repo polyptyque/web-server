@@ -449,10 +449,10 @@ function ThumbsPreview(req,res,next){
 
 function sendMail(to,subject,text,html,callback){
     // create reusable transporter object using the default SMTP transport
-    var transporter = nodemailer.createTransport(config.smtps);
+    const transporter = nodemailer.createTransport(config.smtps);
 
     // setup e-mail data with unicode symbols
-    var mailOptions = {
+    const mailOptions = {
         from: '"Polyptyque" <contact@polyptyque.photo>', // sender address
         to: to, // list of receivers
         subject: subject, // Subject line
@@ -489,7 +489,7 @@ app.use('/mailing',function(req,res,next){
 function MixImages(req, res, next){
     if (!createCanvas || !Image) return next();
     acquireImageSlot(function(releaseSlot) {
-        var released = false;
+        let released = false;
         function cleanup() {
             if (released) return;
             released = true;
@@ -508,7 +508,7 @@ function MixImages(req, res, next){
         res.once('finish', cleanup);
         res.once('error', cleanup);
 
-        var A = req.params.A,
+        const A = req.params.A,
             B = req.params.B,
             n = req.params.n,
             i = parseInt(n),
@@ -519,8 +519,8 @@ function MixImages(req, res, next){
             //i = Math.abs(g+iOffset);
         console.log(i,side,opacity);
 
-        var imgReady = 0,
-            imgSrcBase = './uploads/',
+        let imgReady = 0;
+         const   imgSrcBase = './uploads/',
             imgSrcSuffix = '/'+n+'.jpg',
             canvasA = createCanvas(1, 1), ctxA = canvasA.getContext('2d'), imgSrcA = imgSrcBase + A + imgSrcSuffix,
             canvasB = createCanvas(1, 1), ctxB = canvasB.getContext('2d'), imgSrcB = imgSrcBase + B + imgSrcSuffix;
@@ -531,20 +531,20 @@ function MixImages(req, res, next){
                     cleanup();
                     return next();
                 }
-                var img = new Image;
+                const img = new Image;
                 img.src = squid;
                 canvas.width = img.width;
                 canvas.height = img.height;
                 ctx.drawImage(img, 0, 0, img.width, img.height);
                 imgReady ++;
-                if(imgReady ==2){
+                if(imgReady === 2){
                     Blend();
                 }
             });
         }
 
         function Blend(){
-            var fromCanvas,toCtx,toCanvas;
+            let fromCanvas,toCtx,toCanvas;
             if(side){
                 fromCanvas = canvasA;
                 toCtx = ctxB;
@@ -559,7 +559,7 @@ function MixImages(req, res, next){
             toCtx.drawImage(fromCanvas,0,0);
             res.type("jpg");
 
-            var fileCachePathA = 'mixes/'+A,
+            const fileCachePathA = 'mixes/'+A,
                 fileCachePathB = fileCachePathA+'/'+B;
 
             if (!fs.existsSync(fileCachePathA)) {
@@ -569,7 +569,7 @@ function MixImages(req, res, next){
                 fs.mkdirSync(fileCachePathB);
             }
 
-            var fileCachePath = fileCachePathB+'/'+n+'.jpg',
+            const fileCachePath = fileCachePathB+'/'+n+'.jpg',
                 cache = fs.createWriteStream(fileCachePath),
                 stream = toCanvas.createJPEGStream({quality: 0.75}),
                 tee = new PassThrough();
@@ -599,13 +599,13 @@ function MixImages(req, res, next){
 
 app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
 
-    var shortenUid = req.params['0'];
+    const shortenUid = req.params['0'];
 
-    var useJsonResponse = req.headers['content-type'] == 'application/json';
+    const useJsonResponse = req.headers['content-type'] === 'application/json';
 
-    var sql = "SELECT * FROM `shot` ";
+    let sql = "SELECT * FROM `shot` ";
 
-    if(shortenUid != 'latest'){
+    if(shortenUid !== 'latest'){
         sql += " WHERE `enabled` = 1 AND `uid` REGEXP '^.*"+shortenUid+"$' ";
     }
 
@@ -613,16 +613,16 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
 
     console.log(shortenUid,sql);
 
-    var connection = initializeConnection();
+    const connection = initializeConnection();
     connection.query(sql,function(err, results, fields){
         if(err){
             connection.end();
             console.log(err);
             return res.status(500).send(err);
         }
-        var A = results[0];
+        const A = results[0];
         if(A){
-            var Aid = A.shot_id,
+            const Aid = A.shot_id,
                 query = "SELECT value FROM `relation` WHERE `shot0` = "+Aid+" OR `shot1` = "+Aid+" ORDER by value DESC LIMIT 1;";
             console.log(A);
             console.log(query);
@@ -632,8 +632,8 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                     console.log(err);
                     return res.status(500).send(err);
                 }
-                var max = results[0].value,
-                    query = "SELECT * FROM `relation` WHERE `value` = "+max+" AND (`shot0` = "+Aid+" OR `shot1` = "+Aid+")";
+                const max = results[0].value;
+                const query = "SELECT * FROM `relation` WHERE `value` = "+max+" AND (`shot0` = "+Aid+" OR `shot1` = "+Aid+")";
                 console.log(query);
                 connection.query(query, function(err, results, fields){
                     if(err){
@@ -641,9 +641,9 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                         console.log(err);
                         return res.status(500).send(err);
                     }
-                    var relation = results[0],
+                    const relation = results[0],
                         shot_idB = Aid == relation.shot0 ? relation.shot1 : relation.shot0;
-                    query = "SELECT * FROM `shot` WHERE `shot_id` = "+shot_idB+" LIMIT 1";
+                    const query = "SELECT * FROM `shot` WHERE `shot_id` = "+shot_idB+" LIMIT 1";
                     console.log(query);
                     connection.query(query, function(err,results,fields){
                         if(err){
@@ -652,7 +652,7 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                             return res.status(500).send(err);
                         }
                         connection.end();
-                        var B = results[0],
+                        const B = results[0],
                             imgBaseUrl = '/mixes/'+A.uid+'/'+B.uid+'/';
                         if(useJsonResponse){
                             res.json({
@@ -661,7 +661,6 @@ app.use(/\/([abcdef0-9]{6}|latest)$/,function(req,res,next){
                                 imgBaseUrl:imgBaseUrl
                             })
                         }else{
-                            ;
                             res.render('demo', _.defaults({
                                 imgBaseUrl:imgBaseUrl,
                                 scripts:_.union(baseScripts,['/js/demo.js']),
@@ -686,7 +685,7 @@ app.use('/mixes/thumbs/preview-:uid.jpg',ThumbsPreview);
 
 // List all shots
 function ListAllShots(req,res,next){
-    var connection = initializeConnection();
+    const connection = initializeConnection();
     connection.query("SELECT * FROM `shot` WHERE `enabled` = 1", function(err, results){
         if(err) {
             connection.end();
@@ -705,7 +704,7 @@ app.get('/list-all', ListAllShots);
 // Demo
 function Demo(req, res, next) {
     console.log('Demo. '+req.originalUrl);
-    var imgBaseUrl = 'img/demo/',
+    let imgBaseUrl = 'img/demo/',
         A = req.params.a,
         B = req.params.b;
     if(A && B){
@@ -724,8 +723,7 @@ app.get('/demo-mix/:a/:b', Demo);
 // Demo
 function Preview(req, res, next) {
     console.log('Demo. '+req.originalUrl);
-    var imgBaseUrl = 'img/demo/',
-        uid = req.params.uid;
+    const uid = req.params.uid;
     res.render('preview', _.defaults({
         uid:uid,
         scripts:_.union(baseScripts,['/js/preview.js']),
