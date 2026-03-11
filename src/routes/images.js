@@ -1,4 +1,5 @@
 // Lazy loading : canvas chargé uniquement à la première requête image
+// canvas v3 : Image supprimé → loadImage(path) retourne une Promise
 const express = require('express');
 const fs = require('fs.extra');
 const { PassThrough } = require('stream');
@@ -11,8 +12,8 @@ const uploadDir = './uploads/';
 
 // ── ThumbsPreview ──────────────────────────────────────────────────────────────
 function ThumbsPreview(req, res, next) {
-    const { createCanvas, Image } = getCanvas();
-    if (!createCanvas || !Image) return next();
+    const { createCanvas, loadImage } = getCanvas();
+    if (!createCanvas || !loadImage) return next();
 
     acquireImageSlot(function (releaseSlot) {
         let released = false;
@@ -21,10 +22,7 @@ function ThumbsPreview(req, res, next) {
         function cleanup() {
             if (released) return;
             released = true;
-            if (canvas) {
-                canvas.width = 0;
-                canvas.height = 0;
-            }
+            if (canvas) { canvas.width = 0; canvas.height = 0; }
             releaseSlot();
         }
 
@@ -33,47 +31,34 @@ function ThumbsPreview(req, res, next) {
         res.once('error', cleanup);
 
         const uid = req.params.uid;
-        canvas = createCanvas(1, 1);
         const thumbsScale = 0.1;
         const thumbsTotal = 19;
-        const ctx = canvas.getContext('2d');
-        let imgReady = 0;
-        let thumbWidth, thumbHeight, canvasWidth, canvasHeight;
 
-        function AddImage() {
-            const imgSrc = uploadDir + uid + '/' + imgReady + '.jpg';
-            console.log('AddImage', imgSrc);
-            fs.readFile(imgSrc, function (err, squid) {
-                if (err) {
-                    cleanup();
-                    return next();
-                }
-                const img = new Image();
-                img.src = squid;
+        async function run() {
+            canvas = createCanvas(1, 1);
+            const ctx = canvas.getContext('2d');
 
-                if (imgReady === 0) {
-                    thumbWidth = Math.round(img.width * thumbsScale);
-                    thumbHeight = Math.round(img.height * thumbsScale);
-                    canvasWidth = thumbWidth * thumbsTotal;
-                    canvasHeight = thumbHeight;
-                    canvas.width = canvasWidth;
-                    canvas.height = canvasHeight;
-                    console.log('canvas size', thumbWidth, thumbHeight, canvasWidth, canvasHeight);
+            for (let i = 0; i < thumbsTotal; i++) {
+                const imgSrc = uploadDir + uid + '/' + i + '.jpg';
+                console.log('AddImage', imgSrc);
+
+                // canvas v3 : loadImage() charge directement depuis le chemin
+                const img = await loadImage(imgSrc);
+
+                if (i === 0) {
+                    const thumbWidth = Math.round(img.width * thumbsScale);
+                    const thumbHeight = Math.round(img.height * thumbsScale);
+                    canvas.width = thumbWidth * thumbsTotal;
+                    canvas.height = thumbHeight;
+                    console.log('canvas size', thumbWidth, thumbHeight, canvas.width, canvas.height);
                 }
 
-                ctx.drawImage(img, imgReady * thumbWidth, 0, thumbWidth, thumbHeight);
-                imgReady++;
-                if (imgReady === 19) {
-                    Finish();
-                } else {
-                    AddImage();
-                }
-            });
-        }
+                const thumbWidth = Math.round(img.width * thumbsScale);
+                const thumbHeight = Math.round(img.height * thumbsScale);
+                ctx.drawImage(img, i * thumbWidth, 0, thumbWidth, thumbHeight);
+            }
 
-        function Finish() {
             res.type('jpg');
-
             const fileCachePath = './mixes/thumbs/preview-' + uid + '.jpg';
             const cache = fs.createWriteStream(fileCachePath);
             const stream = canvas.createJPEGStream({ quality: 0.75 });
@@ -81,24 +66,24 @@ function ThumbsPreview(req, res, next) {
 
             stream.on('error', cleanup);
             cache.on('error', cleanup);
-
             stream.pipe(tee);
             tee.pipe(res);
             tee.pipe(cache);
-
-            cache.on('finish', function () {
-                console.log('saved ' + fileCachePath);
-            });
+            cache.on('finish', function () { console.log('saved ' + fileCachePath); });
         }
 
-        AddImage();
+        run().catch(function (err) {
+            console.error('ThumbsPreview error:', err.message);
+            cleanup();
+            next();
+        });
     });
 }
 
 // ── MixImages ──────────────────────────────────────────────────────────────────
 function MixImages(req, res, next) {
-    const { createCanvas, Image } = getCanvas();
-    if (!createCanvas || !Image) return next();
+    const { createCanvas, loadImage } = getCanvas();
+    if (!createCanvas || !loadImage) return next();
 
     acquireImageSlot(function (releaseSlot) {
         let released = false;
@@ -126,56 +111,41 @@ function MixImages(req, res, next) {
         const opacity = Math.round(100 - g * 11.1111);
         console.log(i, side, opacity);
 
-        let imgReady = 0;
-        const imgSrcBase = './uploads/';
-        const imgSrcSuffix = '/' + n + '.jpg';
+        const imgSrcA = './uploads/' + A + '/' + n + '.jpg';
+        const imgSrcB = './uploads/' + B + '/' + n + '.jpg';
 
-        canvasA = createCanvas(1, 1);
-        const ctxA = canvasA.getContext('2d');
-        const imgSrcA = imgSrcBase + A + imgSrcSuffix;
+        async function run() {
+            // canvas v3 : loadImage() en parallèle — plus besoin de fs.readFile
+            const [imgA, imgB] = await Promise.all([
+                loadImage(imgSrcA),
+                loadImage(imgSrcB)
+            ]);
 
-        canvasB = createCanvas(1, 1);
-        const ctxB = canvasB.getContext('2d');
-        const imgSrcB = imgSrcBase + B + imgSrcSuffix;
+            canvasA = createCanvas(imgA.width, imgA.height);
+            const ctxA = canvasA.getContext('2d');
+            ctxA.drawImage(imgA, 0, 0);
 
-        function LoadImage(imgSrc, canvas, ctx) {
-            fs.readFile(imgSrc, function (err, squid) {
-                if (err) {
-                    cleanup();
-                    return next();
-                }
-                const img = new Image();
-                img.src = squid;
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0, img.width, img.height);
-                imgReady++;
-                if (imgReady === 2) Blend();
-            });
-        }
+            canvasB = createCanvas(imgB.width, imgB.height);
+            const ctxB = canvasB.getContext('2d');
+            ctxB.drawImage(imgB, 0, 0);
 
-        function Blend() {
             let fromCanvas, toCtx, toCanvas;
             if (side) {
-                fromCanvas = canvasA;
-                toCtx = ctxB;
-                toCanvas = canvasB;
+                fromCanvas = canvasA; toCtx = ctxB; toCanvas = canvasB;
             } else {
-                fromCanvas = canvasB;
-                toCtx = ctxA;
-                toCanvas = canvasA;
+                fromCanvas = canvasB; toCtx = ctxA; toCanvas = canvasA;
             }
+
             toCtx.globalAlpha = opacity / 100;
             toCtx.globalCompositeOperation = 'darker';
             toCtx.drawImage(fromCanvas, 0, 0);
-            res.type('jpg');
 
             const fileCachePathA = 'mixes/' + A;
             const fileCachePathB = fileCachePathA + '/' + B;
-
             if (!fs.existsSync(fileCachePathA)) fs.mkdirSync(fileCachePathA);
             if (!fs.existsSync(fileCachePathB)) fs.mkdirSync(fileCachePathB);
 
+            res.type('jpg');
             const fileCachePath = fileCachePathB + '/' + n + '.jpg';
             const cache = fs.createWriteStream(fileCachePath);
             const stream = toCanvas.createJPEGStream({ quality: 0.75 });
@@ -183,18 +153,17 @@ function MixImages(req, res, next) {
 
             stream.on('error', cleanup);
             cache.on('error', cleanup);
-
             stream.pipe(tee);
             tee.pipe(res);
             tee.pipe(cache);
-
-            cache.on('finish', function () {
-                console.log('saved ' + fileCachePath);
-            });
+            cache.on('finish', function () { console.log('saved ' + fileCachePath); });
         }
 
-        LoadImage(imgSrcA, canvasA, ctxA);
-        LoadImage(imgSrcB, canvasB, ctxB);
+        run().catch(function (err) {
+            console.error('MixImages error:', err.message);
+            cleanup();
+            next();
+        });
     });
 }
 

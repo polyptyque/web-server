@@ -1,6 +1,7 @@
 // Lazy loading : canvas (module natif C++) n'est chargé qu'à la première utilisation
+// canvas v3 : Image supprimé → utiliser loadImage(src) qui retourne une Promise
 let _createCanvas = null;
-let _Image = null;
+let _loadImage = null;
 let _loaded = false;
 
 function getCanvas() {
@@ -9,12 +10,12 @@ function getCanvas() {
         try {
             const canvasModule = require('canvas');
             _createCanvas = canvasModule.createCanvas;
-            _Image = canvasModule.Image;
+            _loadImage = canvasModule.loadImage;
         } catch (err) {
             console.log('ATTENTION : Canvas indisponible');
         }
     }
-    return { createCanvas: _createCanvas, Image: _Image };
+    return { createCanvas: _createCanvas, loadImage: _loadImage };
 }
 
 module.exports = { getCanvas };
