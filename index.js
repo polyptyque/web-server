@@ -11,7 +11,7 @@ const minifyHTML = require('express-minify-html-2');
     if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 });
 
-const { PORT } = require('./src/config');
+const { PORT, SERVER_MODE } = require('./src/config');
 const { setupHandlebars } = require('./src/middleware/handlebars');
 
 const app = express();
@@ -47,4 +47,5 @@ app.use('/',       require('./src/routes/static'));
 // ── Démarrage ─────────────────────────────────────────────────────────────────
 app.listen(PORT, function () {
     console.log('Server listening on: http://localhost:%s', PORT);
+    console.log('Server Mode : %s', SERVER_MODE);
 });

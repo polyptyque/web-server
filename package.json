@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node scripts/install-mode.js",
+    "install:mode": "node scripts/install-mode.js"
   },
   "repository": {
     "type": "git",

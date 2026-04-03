@@ -5,8 +5,13 @@ const fs = require('fs.extra');
 const { PassThrough } = require('stream');
 const { getCanvas } = require('../canvas');
 const { acquireImageSlot } = require('../cache');
+const { isPresentation } = require('../config');
 
 const router = express.Router();
+
+if (isPresentation) {
+    console.log('⚠️  PRESENTATION mode: Image generation routes (canvas) disabled');
+}
 
 const uploadDir = './uploads/';
 

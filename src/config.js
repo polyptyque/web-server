@@ -35,5 +35,20 @@ const baseScripts = [
     '/js/underscore-min.js'
 ];
 
-module.exports = { config, PORT, _24H_, _15MIN_, _1MONTH_, baseScripts };
+// Mode serveur : PRESENTATION (read-only) ou FULL (défaut)
+const SERVER_MODE = (process.env.POLYPTYQUE_SERVER_MODE || 'FULL').toUpperCase();
+const isPresentation = SERVER_MODE === 'PRESENTATION';
+const isFull = SERVER_MODE === 'FULL';
+
+module.exports = {
+    config,
+    PORT,
+    _24H_,
+    _15MIN_,
+    _1MONTH_,
+    baseScripts,
+    SERVER_MODE,
+    isPresentation,
+    isFull
+};
 

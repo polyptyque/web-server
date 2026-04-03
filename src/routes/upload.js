@@ -3,10 +3,20 @@ const fs = require('fs.extra');
 const sha1 = require('sha1');
 const spawn = require('child_process').spawn;
 const { initializeConnection } = require('../db');
-const { sendMail } = require('../mail');
-const { config } = require('../config');
+const { config, isPresentation } = require('../config');
 
 const router = express.Router();
+
+// ── Mode PRESENTATION: rejeter les uploads ─────────────────────────────────────
+if (isPresentation) {
+    router.post('/', function (req, res) {
+        res.status(403).json({
+            error: 'Server is in PRESENTATION mode (read-only)',
+            message: 'Uploads are disabled'
+        });
+    });
+    module.exports = router;
+} else {
 
 const uploadDir = './uploads/';
 
@@ -117,6 +127,8 @@ router.post('/', function postImage(req, res) {
                             const message =
                                 'Merci ' + firstname + '. Votre portrait est disponible à cette adresse : \n' +
                                 'https://polyptyque.photo/' + shortenId + '>';
+                            // Require dynamique pour éviter erreur en mode PRESENTATION (sans nodemailer)
+                            const { sendMail } = require('../mail');
                             sendMail(email, subject, message, message);
                         }
                     });
@@ -127,6 +139,8 @@ router.post('/', function postImage(req, res) {
         res.status(500).send('server error: ' + err.toString());
     }
 });
+
+}
 
 module.exports = router;
 
