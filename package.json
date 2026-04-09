@@ -31,7 +31,7 @@
     "memory-cache": "^0.2.0",
     "multiparty": "^4.2.1",
     "mysql2": "^3.19.1",
-    "nodemailer": "^8.0.2",
+    "nodemailer": "^8.0.5",
     "sha1": "^1.1.1",
     "webp-middleware": "^0.4.0"
   }
